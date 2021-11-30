@@ -14,7 +14,6 @@ func NewAvl () *Avl {
 type Node struct {
 	value int
 	balance int
-	parent *Node
 	right *Node
 	left *Node
 }
@@ -23,18 +22,19 @@ func NewNode(value int) *Node {
 	return &Node{value: value}
 }
 
-func (t *Avl) Find(value int) (n *Node) {
+func (t *Avl) Find(value int) (n *Node, route []*Node) {
 	n = t.root
 	for n != nil {
+		route = append(route, n)
 		if value == n.value {
-			return n
+			return n, route
 		} else if value > n.value {
 			n = n.right
 		} else if value < n.value {
 			n = n.left
 		}
 	}
-	return nil
+	return nil, []*Node{}
 }
 
 func (t *Avl) Add(value int) *Node {
@@ -61,7 +61,6 @@ func (t *Avl) Add(value int) *Node {
 			}
 		}
 	}
-	nn.parent = n
 	return nn
 }
 
@@ -69,87 +68,99 @@ func (t *Avl) Remove(value int) bool {
 	if t.root == nil {
 		return false
 	}
-	n := t.Find(value)
+	n, route := t.Find(value)
 	if n == nil {
 		return false
 	}
+	parent := t.getParentFromRoute(route)
 	if n.left != nil && n.right != nil {
 		t.removeNodeHasBothChildren(n)
 	} else if n.left != nil {
-		t.removeNodeHasLeft(n)
+		t.removeNodeHasLeft(n, parent)
 	} else if n.right != nil {
-		t.removeNodeHasRight(n)
+		t.removeNodeHasRight(n, parent)
 	} else {
-		t.removeNodeHasNoChild(n)
+		t.removeNodeHasNoChild(n, parent)
 	}
 	return true
 }
 
+func (*Avl) getParentFromRoute(route []*Node) *Node {
+	if len(route) > 1 {
+		return route[len(route)-2]
+	}
+	return nil
+}
+
 func (t *Avl) removeNodeHasBothChildren(n *Node) {
-	leftMax := t.Max(n.left)
+	leftMax, route := t.Max(n.left)
 	n.value = leftMax.value
+	leftMaxParent := n
+	if leftMax != n.left {
+		leftMaxParent = t.getParentFromRoute(route)
+	}
 	if leftMax.left == nil {
-		t.removeNodeHasNoChild(leftMax)
+		t.removeNodeHasNoChild(leftMax, leftMaxParent)
 	} else {
-		t.removeNodeHasLeft(leftMax)
+		t.removeNodeHasLeft(leftMax, leftMaxParent)
 	}
 }
 
-func (t *Avl) removeNodeHasLeft(n *Node) {
-	t.replaceNode(n, n.left)
+func (t *Avl) removeNodeHasLeft(n, parent *Node) {
+	t.replaceNode(n, parent, n.left)
 	n.left = nil
 }
 
-func (t *Avl) removeNodeHasRight(n *Node) {
-	t.replaceNode(n, n.right)
+func (t *Avl) removeNodeHasRight(n, parent *Node) {
+	t.replaceNode(n, parent, n.right)
 	n.right = nil
 }
 
-func (t *Avl) removeNodeHasNoChild(n *Node) {
-	t.replaceNode(n, nil)
+func (t *Avl) removeNodeHasNoChild(n, parent *Node) {
+	t.replaceNode(n, parent, nil)
 }
 
-func (t *Avl) replaceNode(n, newNode *Node) {
-	if n.parent != nil {
-		if n.parent.left == n {
-			n.parent.left = newNode
-		} else if n.parent.right == n {
-			n.parent.right = newNode
+func (t *Avl) replaceNode(n, parent, newNode *Node) {
+	if parent != nil {
+		if parent.left == n {
+			parent.left = newNode
+		} else if parent.right == n {
+			parent.right = newNode
 		}
-		if newNode != nil {
-			newNode.parent = n.parent
-		}
-		n.parent = nil
 	}
 	if n == t.root {
 		t.root = newNode
 	}
 }
 
-func (t *Avl) Max(n *Node) *Node {
+func (t *Avl) Max(n *Node) (max *Node, route []*Node) {
 	if t.root == nil {
-		return nil
+		return nil, nil
 	}
 	if n == nil {
 		n = t.root
 	}
+	route = append(route, n)
 	for n.right != nil {
 		n = n.right
+		route = append(route, n)
 	}
-	return n
+	return n, route
 }
 
-func (t *Avl) Min(n *Node) *Node {
+func (t *Avl) Min(n *Node) (min *Node, route []*Node) {
 	if t.root == nil {
-		return nil
+		return nil, nil
 	}
 	if n == nil {
 		n = t.root
 	}
+	route = append(route, n)
 	for n.left != nil {
 		n = n.left
+		route = append(route, n)
 	}
-	return n
+	return n, route
 }
 
 func (t *Avl) Echo() {
@@ -161,12 +172,13 @@ func (t *Avl) Echo() {
 }
 
 func (t *Avl) echo(n *Node, space string) {
+	space += "    "
 	if n.right != nil {
-		t.echo(n.right, "  "+space)
+		t.echo(n.right, space)
 	}
 	fmt.Println(space, n.value)
 	if n.left != nil {
-		t.echo(n.left, "  "+space)
+		t.echo(n.left, space)
 	}
 }
 

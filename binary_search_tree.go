@@ -13,7 +13,6 @@ func NewBinarySearchTree () *BinarySearchTree {
 
 type Node struct {
 	value int
-	balance int
 	right *Node
 	left *Node
 }

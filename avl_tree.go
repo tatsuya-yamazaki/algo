@@ -98,11 +98,11 @@ func (*Avl) getParentFromRoute(route []*Node) *Node {
 
 func (t *Avl) removeNodeHasBothChildren(n *Node) {
 	leftMax, route := t.Max(n.left)
-	n.value = leftMax.value
 	leftMaxParent := n
 	if leftMax != n.left {
 		leftMaxParent = t.getParentFromRoute(route)
 	}
+	n.value = leftMax.value
 	if leftMax.left == nil {
 		t.removeNodeHasNoChild(leftMax, leftMaxParent)
 	} else {

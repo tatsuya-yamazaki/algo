@@ -22,6 +22,10 @@ func NewNode(value int) *Node {
 	return &Node{value: value}
 }
 
+func (n *Node) Value() int {
+	return n.value
+}
+
 func (t *Avl) Find(value int) (n *Node, route []*Node) {
 	n = t.root
 	for n != nil {

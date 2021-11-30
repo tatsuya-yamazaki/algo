@@ -38,7 +38,7 @@ func (t *Avl) Find(value int) (n *Node, route []*Node) {
 			n = n.left
 		}
 	}
-	return nil, []*Node{}
+	return nil, route
 }
 
 func (t *Avl) Add(value int) *Node {
@@ -46,26 +46,18 @@ func (t *Avl) Add(value int) *Node {
 		t.root = NewNode(value)
 		return t.root
 	}
-	n := t.root
-	nn := NewNode(value)
-	for n != nil {
-		if value >= n.value {
-			if n.right == nil {
-				n.right = nn
-				break
-			} else {
-				n = n.right
-			}
-		} else {
-			if n.left == nil {
-				n.left = nn
-				break
-			} else {
-				n = n.left
-			}
-		}
+	_, route := t.Find(value)
+	parent := route[len(route)-1]
+	if parent.value == value {
+		return parent
 	}
-	return nn
+	nn := NewNode(value)
+	if value > parent.value {
+		parent.right = nn
+	} else {
+		parent.left = nn
+	}
+	return parent
 }
 
 func (t *Avl) Remove(value int) bool {
@@ -184,6 +176,21 @@ func (t *Avl) echo(n *Node, space string) {
 	if n.left != nil {
 		t.echo(n.left, space)
 	}
+}
+
+func (t *Avl) balance(n *Node) {
+}
+
+func (t *Avl) rotateL(n *Node) {
+}
+
+func (t *Avl) rotateR(n *Node) {
+}
+
+func (t *Avl) rotateLR(n *Node) {
+}
+
+func (t *Avl) rotateRL(n *Node) {
 }
 
 func main() {

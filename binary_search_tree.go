@@ -177,8 +177,7 @@ func (t *BinarySearchTree) echo(n *Node, space string) {
 	}
 }
 
-func main() {
-	bst := NewBinarySearchTree()
+func (t *BinarySearchTree) Repl() {
 	for {
 		s := ""
 		n := 0
@@ -186,17 +185,22 @@ func main() {
 		switch s {
 		case "a":
 			fmt.Scan(&n)
-			bst.Add(n)
-			bst.Echo()
+			t.Add(n)
+			t.Echo()
 		case "r":
 			fmt.Scan(&n)
-			bst.Remove(n)
-			bst.Echo()
+			t.Remove(n)
+			t.Echo()
 		case "f":
 			fmt.Scan(&n)
-			fmt.Println(bst.Find(n))
+			fmt.Println(t.Find(n))
 		case "p":
-			bst.Echo()
+			t.Echo()
 		}
 	}
+}
+
+func main() {
+	bst := NewBinarySearchTree()
+	bst.Repl()
 }

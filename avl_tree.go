@@ -278,8 +278,7 @@ func (t *Avl) rotateRL(n, parent, pivot *Node) {
 	t.rotateL(n, parent, n.right)
 }
 
-func main() {
-	avl := NewAvl()
+func (t *Avl) Repl() {
 	for {
 		s := ""
 		n := 0
@@ -287,17 +286,22 @@ func main() {
 		switch s {
 		case "a":
 			fmt.Scan(&n)
-			avl.Add(n)
-			avl.Echo()
+			t.Add(n)
+			t.Echo()
 		case "r":
 			fmt.Scan(&n)
-			avl.Remove(n)
-			avl.Echo()
+			t.Remove(n)
+			t.Echo()
 		case "f":
 			fmt.Scan(&n)
-			fmt.Println(avl.Find(n))
+			fmt.Println(t.Find(n))
 		case "p":
-			avl.Echo()
+			t.Echo()
 		}
 	}
+}
+
+func main() {
+	avl := NewAvl()
+	avl.Repl()
 }

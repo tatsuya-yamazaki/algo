@@ -34,7 +34,7 @@ func (t *Avl) Find(value int) (n *Node, route []*Node) {
 			return n, route
 		} else if value > n.value {
 			n = n.right
-		} else if value < n.value {
+		} else {
 			n = n.left
 		}
 	}
@@ -120,7 +120,7 @@ func (t *Avl) replaceNode(n, parent, newNode *Node) {
 	if parent != nil {
 		if parent.left == n {
 			parent.left = newNode
-		} else if parent.right == n {
+		} else {
 			parent.right = newNode
 		}
 	}
@@ -178,19 +178,26 @@ func (t *Avl) echo(n *Node, space string) {
 	}
 }
 
-func (t *Avl) balance(n *Node) {
+func (t *Avl) balance(n, parent, pivot *Node) {
 }
 
-func (t *Avl) rotateL(n *Node) {
+func (t *Avl) rotateL(n, parent, pivot *Node) {
+	n.right = pivot.left
+	pivot.left = n
+	if parent.right == n {
+		parent.right = pivot
+	} else {
+		parent.left = pivot
+	}
 }
 
-func (t *Avl) rotateR(n *Node) {
+func (t *Avl) rotateR(n, parent, pivot *Node) {
 }
 
-func (t *Avl) rotateLR(n *Node) {
+func (t *Avl) rotateLR(n, parent, pivot *Node) {
 }
 
-func (t *Avl) rotateRL(n *Node) {
+func (t *Avl) rotateRL(n, parent, pivot *Node) {
 }
 
 func main() {

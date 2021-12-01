@@ -33,7 +33,7 @@ func (t *BinarySearchTree) Find(value int) (n *Node, route []*Node) {
 			return n, route
 		} else if value > n.value {
 			n = n.right
-		} else if value < n.value {
+		} else {
 			n = n.left
 		}
 	}
@@ -119,7 +119,7 @@ func (t *BinarySearchTree) replaceNode(n, parent, newNode *Node) {
 	if parent != nil {
 		if parent.left == n {
 			parent.left = newNode
-		} else if parent.right == n {
+		} else {
 			parent.right = newNode
 		}
 	}

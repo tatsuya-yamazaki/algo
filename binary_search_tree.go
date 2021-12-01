@@ -40,15 +40,15 @@ func (t *BinarySearchTree) Find(value int) (n *Node, route []*Node) {
 	return nil, route
 }
 
-func (t *BinarySearchTree) Add(value int) *Node {
+func (t *BinarySearchTree) Add(value int) bool {
 	if t.root == nil {
 		t.root = NewNode(value)
-		return t.root
+		return true
 	}
 	_, route := t.Find(value)
 	parent := route[len(route)-1]
 	if parent.value == value {
-		return parent
+		return false
 	}
 	nn := NewNode(value)
 	if value > parent.value {
@@ -56,7 +56,7 @@ func (t *BinarySearchTree) Add(value int) *Node {
 	} else {
 		parent.left = nn
 	}
-	return parent
+	return true
 }
 
 func (t *BinarySearchTree) Remove(value int) bool {
@@ -68,14 +68,14 @@ func (t *BinarySearchTree) Remove(value int) bool {
 		return false
 	}
 	parent := t.getParentFromRoute(route)
-	if n.left != nil && n.right != nil {
-		t.removeNodeHasBothChildren(n)
-	} else if n.left != nil {
-		t.removeNodeHasLeft(n, parent)
-	} else if n.right != nil {
-		t.removeNodeHasRight(n, parent)
-	} else {
+	if n.left == nil && n.right == nil {
 		t.removeNodeHasNoChild(n, parent)
+	} else if n.left == nil {
+		t.removeNodeHasChild(n, parent, n.right)
+	} else if n.right == nil {
+		t.removeNodeHasChild(n, parent, n.left)
+	} else {
+		t.removeNodeHasChildren(n)
 	}
 	return true
 }
@@ -87,7 +87,7 @@ func (*BinarySearchTree) getParentFromRoute(route []*Node) *Node {
 	return nil
 }
 
-func (t *BinarySearchTree) removeNodeHasBothChildren(n *Node) {
+func (t *BinarySearchTree) removeNodeHasChildren(n *Node) {
 	leftMax, route := t.Max(n.left)
 	leftMaxParent := n
 	if leftMax != n.left {
@@ -97,18 +97,13 @@ func (t *BinarySearchTree) removeNodeHasBothChildren(n *Node) {
 	if leftMax.left == nil {
 		t.removeNodeHasNoChild(leftMax, leftMaxParent)
 	} else {
-		t.removeNodeHasLeft(leftMax, leftMaxParent)
+		t.removeNodeHasChild(leftMax, leftMaxParent, leftMax.left)
 	}
 }
 
-func (t *BinarySearchTree) removeNodeHasLeft(n, parent *Node) {
-	t.replaceNode(n, parent, n.left)
-	n.left = nil
-}
-
-func (t *BinarySearchTree) removeNodeHasRight(n, parent *Node) {
-	t.replaceNode(n, parent, n.right)
-	n.right = nil
+func (t *BinarySearchTree) removeNodeHasChild(n, parent, child *Node) {
+	t.replaceNode(n, parent, child)
+	child = nil
 }
 
 func (t *BinarySearchTree) removeNodeHasNoChild(n, parent *Node) {

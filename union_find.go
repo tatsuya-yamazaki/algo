@@ -31,8 +31,8 @@ type UnionFind struct {
 }
 
 func NewUnionFind(length int) *UnionFind {
-	parent := make([]int, length, length)
-	rank := make([]int, length, length)
+	parent := make([]int, length)
+	rank := make([]int, length)
 	for i:=0; i<length; i++ {
 		parent[i] = i
 	}

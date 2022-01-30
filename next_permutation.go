@@ -6,14 +6,14 @@ func main() {
 	for {
 		c++
 		fmt.Println(s)
-		if nextPermutation(s) {
+		if NextPermutation(s) {
 			break
 		}
 	}
 	fmt.Println(c)
 }
 
-func nextPermutation(s []int) bool {
+func NextPermutation(s []int) bool {
 	l, b := -1, -1
 	for i:=0; i<len(s)-1; i++ {
 		if s[i] < s[i+1] {

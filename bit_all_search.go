@@ -4,10 +4,10 @@ import (
 )
 
 func main() {
-	fmt.Println(bitAll(5))
+	fmt.Println(BitAll(5))
 }
 
-func bitAll(n int) [][]int {
+func BitAll(n int) [][]int {
 	ret := make([][]int, 1<<n)
 	for i:=0; i<(1<<n); i++ {
 		var r []int

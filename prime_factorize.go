@@ -6,11 +6,11 @@ import(
 )
 
 func main() {
-	fmt.Println(primeFactorize(138600))
-	fmt.Println(primeFactorize(1000000007))
+	fmt.Println(PrimeFactorize(138600))
+	fmt.Println(PrimeFactorize(1000000007))
 }
 
-func primeFactorize(n int) (ret [][2]int) {
+func PrimeFactorize(n int) (ret [][2]int) {
 	root := int(math.Sqrt(float64(n)))
 	for i:=2; i<=root; i++ {
 		var factor [2]int

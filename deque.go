@@ -5,7 +5,7 @@ import(
 )
 
 func main() {
-	var d Deque
+	d := NewDeque()
 
 	d.AddLeft(1)
 	d.AddLeft(2)
@@ -72,6 +72,10 @@ func main() {
 type Deque struct {
 	begin *LinkedList
 	end *LinkedList
+}
+
+func NewDeque() *Deque {
+	return &Deque{}
 }
 
 func (d *Deque) Next() bool {

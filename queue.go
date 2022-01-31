@@ -5,7 +5,7 @@ import(
 )
 
 func main() {
-	var q Queue
+	q := NewQueue()
 
 	q.Add(1)
 	q.Add(2)
@@ -27,6 +27,10 @@ func main() {
 type Queue struct {
 	begin *LinkedList
 	end *LinkedList
+}
+
+func NewQueue() *Queue {
+	return &Queue{}
 }
 
 func (q *Queue) Next() bool {

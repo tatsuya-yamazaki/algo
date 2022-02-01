@@ -9,6 +9,11 @@ type Heap struct {
 	isChild func(parent, child int) bool
 }
 
+const(
+	ASCENDING = true
+	DECENDING = false
+)
+
 func NewHeap(ascending bool) *Heap {
 	h := &Heap{make([]int, 0), nil}
 	if ascending {
@@ -69,6 +74,10 @@ func (h *Heap) Pop() int {
 		}
 	}
 	return ret
+}
+
+func (h *Heap) Next() bool {
+	return len(h.list) != 0
 }
 
 func main() {

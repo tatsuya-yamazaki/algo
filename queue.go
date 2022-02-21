@@ -7,18 +7,18 @@ import(
 func main() {
 	q := NewQueue()
 
-	q.Add(1)
-	q.Add(2)
-	q.Add(3)
-	q.Add(4)
+	q.Push(1)
+	q.Push(2)
+	q.Push(3)
+	q.Push(4)
 	for q.Next() {
 		fmt.Println(q.Pop())
 	}
 
-	q.Add(5)
-	q.Add(6)
-	q.Add(7)
-	q.Add(8)
+	q.Push(5)
+	q.Push(6)
+	q.Push(7)
+	q.Push(8)
 	for q.Next() {
 		fmt.Println(q.Pop())
 	}
@@ -40,7 +40,7 @@ func (q *Queue) Next() bool {
 	return true
 }
 
-func (q *Queue) Add(value int) {
+func (q *Queue) Push(value int) {
 	ll := &LinkedList{q.end, nil, value}
 	if q.end == nil {
 		q.begin = ll

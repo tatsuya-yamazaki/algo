@@ -7,62 +7,62 @@ import(
 func main() {
 	d := NewDeque()
 
-	d.AddLeft(1)
-	d.AddLeft(2)
-	d.AddLeft(3)
-	d.AddLeft(4)
-	d.AddLeft(5)
-	d.AddLeft(6)
-	d.AddLeft(7)
-	d.AddLeft(8)
+	d.PushLeft(1)
+	d.PushLeft(2)
+	d.PushLeft(3)
+	d.PushLeft(4)
+	d.PushLeft(5)
+	d.PushLeft(6)
+	d.PushLeft(7)
+	d.PushLeft(8)
 	for d.Next() {
 		fmt.Println(d.PopRight())
 	}
 
-	d.AddLeft(1)
-	d.AddLeft(2)
-	d.AddLeft(3)
-	d.AddLeft(4)
-	d.AddLeft(5)
-	d.AddLeft(6)
-	d.AddLeft(7)
-	d.AddLeft(8)
+	d.PushLeft(1)
+	d.PushLeft(2)
+	d.PushLeft(3)
+	d.PushLeft(4)
+	d.PushLeft(5)
+	d.PushLeft(6)
+	d.PushLeft(7)
+	d.PushLeft(8)
 	for d.Next() {
 		fmt.Println(d.PopLeft())
 	}
 
-	d.AddRight(1)
-	d.AddRight(2)
-	d.AddRight(3)
-	d.AddRight(4)
-	d.AddRight(5)
-	d.AddRight(6)
-	d.AddRight(7)
-	d.AddRight(8)
+	d.PushRight(1)
+	d.PushRight(2)
+	d.PushRight(3)
+	d.PushRight(4)
+	d.PushRight(5)
+	d.PushRight(6)
+	d.PushRight(7)
+	d.PushRight(8)
 	for d.Next() {
 		fmt.Println(d.PopRight())
 	}
 
-	d.AddRight(1)
-	d.AddRight(2)
-	d.AddRight(3)
-	d.AddRight(4)
-	d.AddRight(5)
-	d.AddRight(6)
-	d.AddRight(7)
-	d.AddRight(8)
+	d.PushRight(1)
+	d.PushRight(2)
+	d.PushRight(3)
+	d.PushRight(4)
+	d.PushRight(5)
+	d.PushRight(6)
+	d.PushRight(7)
+	d.PushRight(8)
 	for d.Next() {
 		fmt.Println(d.PopLeft())
 	}
 
-	d.AddLeft(1)
-	d.AddRight(2)
-	d.AddLeft(3)
-	d.AddRight(4)
-	d.AddLeft(5)
-	d.AddRight(6)
-	d.AddLeft(7)
-	d.AddRight(8)
+	d.PushLeft(1)
+	d.PushRight(2)
+	d.PushLeft(3)
+	d.PushRight(4)
+	d.PushLeft(5)
+	d.PushRight(6)
+	d.PushLeft(7)
+	d.PushRight(8)
 	for d.Next() {
 		fmt.Println(d.PopLeft())
 	}
@@ -85,7 +85,7 @@ func (d *Deque) Next() bool {
 	return true
 }
 
-func (d *Deque) AddLeft(value int) {
+func (d *Deque) PushLeft(value int) {
 	ll := &LinkedList{nil, d.begin, value}
 	if d.begin == nil {
 		d.end = ll
@@ -95,7 +95,7 @@ func (d *Deque) AddLeft(value int) {
 	d.begin = ll
 }
 
-func (d *Deque) AddRight(value int) {
+func (d *Deque) PushRight(value int) {
 	ll := &LinkedList{d.end, nil, value}
 	if d.end == nil {
 		d.begin = ll

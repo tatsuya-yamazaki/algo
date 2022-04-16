@@ -18,7 +18,7 @@ func main() {
 }
 
 func LowerBound(s []int, value int) int {
-	l, r := 0, len(s)
+	l, r := 0, len(s)-1
 	for l != r {
 		m := (l + r) / 2
 		if value > s[m] {

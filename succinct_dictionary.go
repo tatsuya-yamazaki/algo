@@ -7,6 +7,9 @@ func main() {
 	fmt.Println(s.Access(7))
 }
 
+// bをuint8でテーブルをつくる。パッケージ定数としてconstで
+// sは、int8でやるなら31まで？パフォーマンスやメモリを考えて型を調整。
+
 type SuccinctDictionary struct {
 	l []int
 	s []uint8

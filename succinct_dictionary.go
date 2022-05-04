@@ -14,7 +14,8 @@ func main() {
 }
 
 type SuccinctDictionary struct {
-	chunks []uint32 // max bits size N is 2**31 - 1 (max int32)
+	size int
+	chunks []int // max bits size N is 2**31 - 1 (max int32)
 	blocks []uint8
 	bits   []uint8
 }
@@ -32,6 +33,7 @@ func NewSuccinctDictionary(size int) *SuccinctDictionary {
 		return nil
 	}
 	s := &SuccinctDictionary{}
+	s.size = size
 	getSuitableLength := func(n int) int {
 		ret := size / n
 		if size%n > 0 {
@@ -39,7 +41,7 @@ func NewSuccinctDictionary(size int) *SuccinctDictionary {
 		}
 		return ret
 	}
-	s.chunks = make([]uint32, getSuitableLength(CHUNK_SIZE))
+	s.chunks = make([]int, getSuitableLength(CHUNK_SIZE))
 	s.blocks = make([]uint8, getSuitableLength(BLOCK_SIZE))
 	s.bits = make([]uint8, getSuitableLength(BITS_SIZE))
 	return s
@@ -117,7 +119,7 @@ func (s *SuccinctDictionary) Build() {
 			bi = bin
 		}
 		c := bitNums[v]
-		s.chunks[ci] += uint32(c)
+		s.chunks[ci] += int(c)
 		s.blocks[bi] += c
 	}
 }
@@ -148,12 +150,8 @@ func (s SuccinctDictionary) Rank(index int) (ret int) {
 	return ret
 }
 
-func (s SuccinctDictionary) Size() int {
-	return BITS_SIZE * len(s.bits)
-}
-
 func (s SuccinctDictionary) Select(n int) int {
-	l, r := 0, s.Size()
+	l, r := 0, s.size
 	var m int
 	for l < r {
 		m = (l + r) / 2

@@ -10,6 +10,7 @@ func main() {
 	s.Set(7, false)
 	fmt.Println(s.Access(7))
 
+	//TODO test Build Rank Select
 	s.Set(7, true)
 }
 

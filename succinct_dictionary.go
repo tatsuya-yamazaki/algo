@@ -176,7 +176,7 @@ func (s SuccinctDictionary) Size() int {
 	return s.size
 }
 
-// 0 origin
+// 0-origin
 func (s SuccinctDictionary) Select(n int) int {
 	l, r := 0, s.size
 	var m int

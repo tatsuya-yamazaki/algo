@@ -2,30 +2,101 @@ package main
 
 import (
 	"fmt"
+	"sort"
 )
 
 func main() {
+	t := []int{5,4,5,5,2,1,5,6,1,3,5,0}
+	w := NewWaveletMatrix(t)
+
+	for i:=2; i>=0; i-- {
+		for j:=0; j<len(t); j++ {
+			if w.bitVectors[i].Access(j) {
+				fmt.Print(1)
+			} else {
+				fmt.Print(0)
+			}
+		}
+		fmt.Println()
+	}
+
+	fmt.Println(t)
+	for i:=0; i<len(t); i++ {
+		fmt.Print(w.Access(i))
+	}
+	fmt.Println()
+
 }
 
 type WaveletMatrix struct {
-	t []int
-	[]*SuccinctDictionary
+	bitVectors []*SuccinctDictionary
+	zeroNums []int
 }
 
-func NewWaveletMatrix(t []int) {
+func NewWaveletMatrix(t []int) *WaveletMatrix {
 	if len(t) == 0 {
 		return nil
 	}
 	max := 0
-	for _, v := range t {
-		if max < v {
-			max = v
+	for i, v := range t {
+		if t[max] < v {
+			max = i
 		}
 	}
-	nt := make([]int, len(t))
-	copy(nt, t)
-	w := &WaveletMatrix{nt, nil}
+	topBit := 0
+	for i:=0; i<64; i++ {
+		if t[max] & (1<<i) > 0 {
+			topBit = i
+		}
+	}
 
+	length := topBit + 1
+	w := &WaveletMatrix{make([]*SuccinctDictionary, length), make([]int, length)}
+
+	type sortInt struct {
+		v, b int
+	}
+	sis := make([]sortInt, len(t))
+	for i:=0; i<len(t); i++ {
+		sis[i].v = t[i]
+	}
+
+	for i:=topBit; i>=0; i-- {
+		s := NewSuccinctDictionary(len(sis))
+		for j, v := range sis {
+			if v.v & (1<<i) > 0 {
+				s.Set(j, true)
+				sis[j].b = 1
+			} else {
+				sis[j].b = 0
+			}
+		}
+		s.Build()
+		w.bitVectors[i] = s
+		w.zeroNums[i] = s.Size() - s.Rank(s.Size()-1)
+		sort.SliceStable(sis, func(k, l int) bool { 
+			return sis[k].b < sis[l].b
+		})
+	}
+	return w
+}
+
+func (w WaveletMatrix) Access(index int) int {
+	r := 0
+	for i:=len(w.bitVectors)-1; i>=0; i-- {
+		s := w.bitVectors[i]
+		z := w.zeroNums[i]
+		if s.Access(index) {
+			r += 1<<i
+			index = z + s.Rank(index) - 1
+		} else {
+			index = index - s.Rank(index)
+		}
+	}
+	return r
+}
+
+func (w WaveletMatrix) Rank(index int) int {
 }
 
 type SuccinctDictionary struct {

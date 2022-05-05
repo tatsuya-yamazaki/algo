@@ -85,10 +85,9 @@ func (w WaveletMatrix) Access(index int) int {
 	r := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
 		s := w.bitVectors[i]
-		z := w.zeroNums[i]
 		if s.Access(index) {
 			r += 1<<i
-			index = z + s.Rank(index) - 1 // 0-origin
+			index = w.zeroNums[i] + s.Rank(index) - 1 // 0-origin
 		} else {
 			index = index - s.Rank(index)
 		}

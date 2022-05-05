@@ -31,6 +31,7 @@ func main() {
 type WaveletMatrix struct {
 	bitVectors []*SuccinctDictionary
 	zeroNums []int
+	firstIndexes map[int]int
 }
 
 func NewWaveletMatrix(t []int) *WaveletMatrix {
@@ -51,7 +52,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	}
 
 	length := topBit + 1
-	w := &WaveletMatrix{make([]*SuccinctDictionary, length), make([]int, length)}
+	w := &WaveletMatrix{make([]*SuccinctDictionary, length), make([]int, length), make(map[int]int)}
 
 	type sortInt struct {
 		v, b int
@@ -74,9 +75,13 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		s.Build()
 		w.bitVectors[i] = s
 		w.zeroNums[i] = s.Size() - s.Rank(s.Size()-1)
-		sort.SliceStable(sis, func(k, l int) bool { 
-			return sis[k].b < sis[l].b
-		})
+		sort.SliceStable(sis, func(k, l int) bool {return sis[k].b < sis[l].b})
+	}
+	for i:=0; i<len(sis); i++ {
+		_, ok := w.firstIndexes[sis[i].v]
+		if !ok {
+			w.firstIndexes[sis[i].v] = i
+		}
 	}
 	return w
 }

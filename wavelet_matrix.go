@@ -5,34 +5,27 @@ import (
 )
 
 func main() {
-	s := NewSuccinctDictionary(1038)
-	//s := NewSuccinctDictionary(1<<32)
-	s.Set(7, true)
-	fmt.Println(s.Access(7))
-	s.Set(7, true)
-	fmt.Println(s.Access(7))
-	s.Set(7, false)
-	fmt.Println(s.Access(7))
+}
 
-	for i:=0; i<1038; i++ {
-		s.Set(i, true)
+type WaveletMatrix struct {
+	t []int
+	[]*SuccinctDictionary
+}
+
+func NewWaveletMatrix(t []int) {
+	if len(t) == 0 {
+		return nil
 	}
-	s.Build()
-	for i:=0; i<1038; i++ {
-		if r := s.Rank(i); i + 1 != r {
-			fmt.Println(i)
-			fmt.Println("rank", i + 1, r)
-			fmt.Println("/////////////")
-		}
-		if sl := s.Select(i + 1); i != sl {
-			fmt.Println(i)
-			fmt.Println("select", i, sl)
-			fmt.Println("/////////////")
+	max := 0
+	for _, v := range t {
+		if max < v {
+			max = v
 		}
 	}
-	fmt.Println(s.bits)
-	fmt.Println(s.blocks)
-	fmt.Println(s.chunks)
+	nt := make([]int, len(t))
+	copy(nt, t)
+	w := &WaveletMatrix{nt, nil}
+
 }
 
 type SuccinctDictionary struct {

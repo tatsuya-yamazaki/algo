@@ -1,23 +1,44 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
-	s := NewSuccinctDictionary(17)
+	s := NewSuccinctDictionary(1038)
 	//s := NewSuccinctDictionary(1<<32)
+	s.Set(7, true)
+	fmt.Println(s.Access(7))
 	s.Set(7, true)
 	fmt.Println(s.Access(7))
 	s.Set(7, false)
 	fmt.Println(s.Access(7))
 
-	//TODO test Build Rank Select
-	s.Set(7, true)
+	for i:=0; i<1038; i++ {
+		s.Set(i, true)
+	}
+	s.Build()
+	for i:=0; i<1038; i++ {
+		if r := s.Rank(i); i + 1 != r {
+			fmt.Println(i)
+			fmt.Println("rank", i + 1, r)
+			fmt.Println("/////////////")
+		}
+		if sl := s.Select(i + 1); i != sl {
+			fmt.Println(i)
+			fmt.Println("select", i, sl)
+			fmt.Println("/////////////")
+		}
+	}
+	fmt.Println(s.bits)
+	fmt.Println(s.blocks)
+	fmt.Println(s.chunks)
 }
 
 type SuccinctDictionary struct {
 	size int
 	chunks []int // max bits size N is 2**31 - 1 (max int32)
-	blocks []uint8
+	blocks []uint16
 	bits   []uint8
 }
 
@@ -43,7 +64,7 @@ func NewSuccinctDictionary(size int) *SuccinctDictionary {
 		return ret
 	}
 	s.chunks = make([]int, getSuitableLength(CHUNK_SIZE))
-	s.blocks = make([]uint8, getSuitableLength(BLOCK_SIZE))
+	s.blocks = make([]uint16, getSuitableLength(BLOCK_SIZE))
 	s.bits = make([]uint8, getSuitableLength(BITS_SIZE))
 	return s
 }
@@ -121,7 +142,7 @@ func (s *SuccinctDictionary) Build() {
 		}
 		c := bitNums[v]
 		s.chunks[ci] += int(c)
-		s.blocks[bi] += c
+		s.blocks[bi] += uint16(c)
 	}
 }
 
@@ -132,25 +153,26 @@ func (s SuccinctDictionary) Rank(index int) (ret int) {
 	}
 
 	blockIndex := getBlockIndex(index)
-	if blockIndex > 0 {
+	if blockIndex > 0 && (BLOCK_SIZE * blockIndex % CHUNK_SIZE != 0) {
 		ret += int(s.blocks[blockIndex-1])
 	}
 
 	bitsIndex := getBitsIndex(index)
 	bits := uint8(s.bits[bitsIndex])
-	for i := uint8(1); i <= getBit(index); i <<= 1 {
+	for i := uint8(1); (i <= getBit(index) && i > 0); i <<= 1 {
 		if i&bits > 0 {
 			ret++
 		}
 	}
 
-	for i := index - 1; i >= 0 && blockIndex == getBlockIndex(i*BLOCK_SIZE); i-- {
+	for i := bitsIndex - 1; i >= 0 && blockIndex == getBlockIndex(i*BITS_SIZE); i-- {
 		ret += int(bitNums[s.bits[i]])
 	}
 
 	return ret
 }
 
+// 0 origin
 func (s SuccinctDictionary) Select(n int) int {
 	l, r := 0, s.size
 	var m int
@@ -163,5 +185,5 @@ func (s SuccinctDictionary) Select(n int) int {
 			r = m
 		}
 	}
-	return m
+	return l
 }

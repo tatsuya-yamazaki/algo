@@ -9,6 +9,7 @@ func main() {
 	t := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(t)
 
+	fmt.Println("/////////////bit vectors")
 	for i:=2; i>=0; i-- {
 		for j:=0; j<len(t); j++ {
 			if w.bitVectors[i].Access(j) {
@@ -20,11 +21,23 @@ func main() {
 		fmt.Println()
 	}
 
+	fmt.Println("/////////////access")
 	fmt.Println(t)
 	for i:=0; i<len(t); i++ {
 		fmt.Print(w.Access(i))
 	}
 	fmt.Println()
+
+	fmt.Println("/////////////rank")
+	for _, v := range t {
+		fmt.Println("value", v)
+		fmt.Println(t)
+		for i:=0; i<len(t); i++ {
+			fmt.Print(w.Rank(v, i))
+			fmt.Print(" ")
+		}
+		fmt.Println()
+	}
 
 }
 
@@ -100,7 +113,28 @@ func (w WaveletMatrix) Access(index int) int {
 	return r
 }
 
-func (w WaveletMatrix) Rank(index int) int {
+func (w WaveletMatrix) Rank(value, index int) int {
+	fi, ok := w.firstIndexes[value]
+	if !ok {
+		return 0
+	}
+	for i:=len(w.bitVectors)-1; i>=0; i-- {
+		s := w.bitVectors[i]
+		if value & (1<<i) > 0 {
+			index = w.zeroNums[i] + s.Rank(index) - 1 // 0-origin
+		} else {
+			index = index - s.Rank(index)
+			// if bitVector[index] is 1 and index is 0. ex) [1 0 0 0 0]
+			if index < 0 {
+				break
+			}
+		}
+	}
+	if index < fi {
+		return 0
+	} else {
+		return index - fi + 1
+	}
 }
 
 type SuccinctDictionary struct {

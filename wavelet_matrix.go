@@ -120,13 +120,17 @@ func (w WaveletMatrix) Rank(value, index int) int {
 	}
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
 		s := w.bitVectors[i]
+		rank := s.Rank(index)
 		if value & (1<<i) > 0 {
-			index = w.zeroNums[i] + s.Rank(index) - 1 // 0-origin
+			if rank == 0 {
+				return 0
+			}
+			index = w.zeroNums[i] + rank - 1 // 0-origin
 		} else {
-			index = index - s.Rank(index)
+			index = index - rank
 			// if bitVector[index] is 1 and index is 0. ex) [1 0 0 0 0]
 			if index < 0 {
-				break
+				return 0
 			}
 		}
 	}

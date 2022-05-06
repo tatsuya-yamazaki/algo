@@ -8,6 +8,10 @@ import (
 func main() {
 	t := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(t)
+	m := make(map[int]struct{})
+	for _, v := range t {
+		m[v] = struct{}{}
+	}
 
 	fmt.Println("/////////////bit vectors")
 	for i:=2; i>=0; i-- {
@@ -21,19 +25,30 @@ func main() {
 		fmt.Println()
 	}
 
-	fmt.Println("/////////////access")
+	fmt.Println("/////////////access/////////////")
 	fmt.Println(t)
 	for i:=0; i<len(t); i++ {
 		fmt.Print(w.Access(i))
 	}
 	fmt.Println()
 
-	fmt.Println("/////////////rank")
-	for _, v := range t {
-		fmt.Println("value", v)
+	fmt.Println("/////////////rank/////////////")
+	for k, _ := range m {
+		fmt.Println("value", k)
 		fmt.Println(t)
 		for i:=0; i<len(t); i++ {
-			fmt.Print(w.Rank(v, i))
+			fmt.Print(w.Rank(k, i))
+			fmt.Print(" ")
+		}
+		fmt.Println()
+	}
+
+	fmt.Println("/////////////select/////////////")
+	for k, _ := range m {
+		fmt.Println("value", k)
+		fmt.Println(t)
+		for i:=0; i<len(t); i++ {
+			fmt.Print(w.Select(k, i))
 			fmt.Print(" ")
 		}
 		fmt.Println()
@@ -107,7 +122,7 @@ func (w WaveletMatrix) Access(index int) int {
 			r += 1<<i
 			index = w.zeroNums[i] + s.Rank(index) - 1 // 0-origin
 		} else {
-			index = index - s.Rank(index)
+			index = s.Rank0(index) - 1
 		}
 	}
 	return r
@@ -120,16 +135,16 @@ func (w WaveletMatrix) Rank(value, index int) int {
 	}
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
 		s := w.bitVectors[i]
-		rank := s.Rank(index)
 		if value & (1<<i) > 0 {
+			rank := s.Rank(index)
 			// No applicable data
 			if rank == 0 {
 				return 0
 			}
 			index = w.zeroNums[i] + rank - 1 // 0-origin
 		} else {
-			index = index - rank
-			// No applicable data. If bitVector[index] is 1 and index is 0. ex) [1 0 0 0 0]
+			index = s.Rank0(index) - 1
+			// No applicable data
 			if index < 0 {
 				return 0
 			}
@@ -140,6 +155,32 @@ func (w WaveletMatrix) Rank(value, index int) int {
 	} else {
 		return index - fi + 1
 	}
+}
+
+// rank is the ascending rank of the values in the array. 0-origin
+func (w WaveletMatrix) Select(value, rank int) int {
+	out := w.bitVectors[0].Size() //out of range
+	fi, ok := w.firstIndexes[value]
+	index := fi + rank
+	if !ok || rank < 0 || out <= index {
+		return out
+	}
+
+	for i:=0; i<len(w.bitVectors); i++ {
+		s := w.bitVectors[i]
+		if value & (1<<i) > 0 {
+			index = s.Select(index + 1 - w.zeroNums[i])
+		} else {
+			index = s.Select0(index + 1)
+		}
+		if out <= index {
+			return out
+		}
+	}
+	if value == w.Access(index) {
+		return index
+	}
+	return out
 }
 
 type SuccinctDictionary struct {
@@ -211,6 +252,10 @@ func getBitsIndex(index int) int {
 	return index / BITS_SIZE
 }
 
+func (s SuccinctDictionary) Size() int {
+	return s.size
+}
+
 func (s SuccinctDictionary) Access(index int) bool {
 	b := s.bits[getBitsIndex(index)]
 	return b&getBit(index) > 0
@@ -279,17 +324,34 @@ func (s SuccinctDictionary) Rank(index int) (ret int) {
 	return ret
 }
 
-func (s SuccinctDictionary) Size() int {
-	return s.size
-}
-
-// 0 origin
+// return value is 0-origin index
 func (s SuccinctDictionary) Select(n int) int {
 	l, r := 0, s.size
 	var m int
 	for l < r {
 		m = (l + r) / 2
 		rank := s.Rank(m)
+		if rank < n {
+			l = m + 1
+		} else {
+			r = m
+		}
+	}
+	return l
+}
+
+// index is 0-origin
+func (s SuccinctDictionary) Rank0(index int) int {
+	return index + 1 - s.Rank(index)
+}
+
+// return value is 0-origin index
+func (s SuccinctDictionary) Select0(n int) int {
+	l, r := 0, s.size
+	var m int
+	for l < r {
+		m = (l + r) / 2
+		rank := s.Rank0(m)
 		if rank < n {
 			l = m + 1
 		} else {

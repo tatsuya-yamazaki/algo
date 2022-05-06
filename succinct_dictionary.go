@@ -14,6 +14,7 @@ func main() {
 	s.Set(7, false)
 	fmt.Println(s.Access(7))
 
+	fmt.Println("//////////one///////////")
 	for i:=0; i<1038; i++ {
 		s.Set(i, true)
 	}
@@ -33,6 +34,28 @@ func main() {
 	fmt.Println(s.bits)
 	fmt.Println(s.blocks)
 	fmt.Println(s.chunks)
+
+	fmt.Println("//////////zero///////////")
+	for i:=0; i<1038; i++ {
+		s.Set(i, false)
+	}
+	s.Build()
+	for i:=0; i<1038; i++ {
+		if r := s.Rank0(i); i + 1 != r {
+			fmt.Println(i)
+			fmt.Println("rank0", i + 1, r)
+			fmt.Println("/////////////")
+		}
+		if sl := s.Select0(i + 1); i != sl {
+			fmt.Println(i)
+			fmt.Println("select0", i, sl)
+			fmt.Println("/////////////")
+		}
+	}
+	fmt.Println(s.bits)
+	fmt.Println(s.blocks)
+	fmt.Println(s.chunks)
+
 }
 
 type SuccinctDictionary struct {
@@ -104,6 +127,10 @@ func getBitsIndex(index int) int {
 	return index / BITS_SIZE
 }
 
+func (s SuccinctDictionary) Size() int {
+	return s.size
+}
+
 func (s SuccinctDictionary) Access(index int) bool {
 	b := s.bits[getBitsIndex(index)]
 	return b&getBit(index) > 0
@@ -172,17 +199,34 @@ func (s SuccinctDictionary) Rank(index int) (ret int) {
 	return ret
 }
 
-func (s SuccinctDictionary) Size() int {
-	return s.size
-}
-
-// 0-origin
+// return value is 0-origin index
 func (s SuccinctDictionary) Select(n int) int {
 	l, r := 0, s.size
 	var m int
 	for l < r {
 		m = (l + r) / 2
 		rank := s.Rank(m)
+		if rank < n {
+			l = m + 1
+		} else {
+			r = m
+		}
+	}
+	return l
+}
+
+// index is 0-origin
+func (s SuccinctDictionary) Rank0(index int) int {
+	return index + 1 - s.Rank(index)
+}
+
+// return value is 0-origin index
+func (s SuccinctDictionary) Select0(n int) int {
+	l, r := 0, s.size
+	var m int
+	for l < r {
+		m = (l + r) / 2
+		rank := s.Rank0(m)
 		if rank < n {
 			l = m + 1
 		} else {

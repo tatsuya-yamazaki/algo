@@ -130,32 +130,15 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	return w
 }
 
-// return pos is 0-origin.
-func (w WaveletMatrix) nextPos0(i, j int) int {
-	return w.bitVectors[i].Rank0(j) - 1
-}
-
-// return pos is 0-origin.
-func (w WaveletMatrix) nextPos1(i, j int) int {
-	return w.zeroNums[i] + w.bitVectors[i].Rank(j) - 1
-}
-
-// return pos is 0-origin.
-func (w WaveletMatrix) nextPos(i, j int) int {
-	if w.bitVectors[i].Access(j) {
-		return w.nextPos1(i, j)
-	}
-	return w.nextPos0(i, j)
-}
-
 func (w WaveletMatrix) Access(index int) int {
 	r := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
-		if w.bitVectors[i].Access(index) {
+		s := w.bitVectors[i]
+		if s.Access(index) {
 			r += 1<<i
-			index = w.nextPos1(i, index)
+			index = w.zeroNums[i] + s.Rank(index) - 1 // 0-origin
 		} else {
-			index = w.nextPos0(i, index)
+			index = s.Rank0(index) - 1
 		}
 	}
 	return r

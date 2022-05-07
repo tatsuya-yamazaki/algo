@@ -13,45 +13,61 @@ func main() {
 		m[v] = struct{}{}
 	}
 
-	fmt.Println("/////////////bit vectors")
-	for i:=2; i>=0; i-- {
-		for j:=0; j<len(t); j++ {
-			if w.bitVectors[i].Access(j) {
-				fmt.Print(1)
-			} else {
-				fmt.Print(0)
+	fmt.Println("/////////////Access/////////////")
+	for i:=0; i<len(t); i++ {
+		if w.Access(i) != t[i] {
+			fmt.Println(i, t[i])
+		}
+	}
+
+	fmt.Println("/////////////Rank/////////////")
+	for k, _ := range m {
+		for i:=0; i<len(t); i++ {
+			c := 0
+			for j:=0; j<=i; j++ {
+				if t[j] == k {
+					c++
+				}
+			}
+			if w.Rank(k,i) != c {
+				fmt.Println(k, i)
 			}
 		}
-		fmt.Println()
 	}
 
-	fmt.Println("/////////////access/////////////")
-	fmt.Println(t)
-	for i:=0; i<len(t); i++ {
-		fmt.Print(w.Access(i))
-	}
-	fmt.Println()
-
-	fmt.Println("/////////////rank/////////////")
+	fmt.Println("/////////////Select/////////////")
 	for k, _ := range m {
-		fmt.Println("value", k)
-		fmt.Println(t)
 		for i:=0; i<len(t); i++ {
-			fmt.Print(w.Rank(k, i))
-			fmt.Print(" ")
+			a := len(t)
+			c := 0
+			for j:=0; j<len(t); j++ {
+				if t[j] == k {
+					c++
+					if i == c - 1 {
+						a = j
+					}
+				}
+			}
+			if w.Select(k, i) != a {
+				fmt.Println(k, i)
+			}
 		}
-		fmt.Println()
 	}
 
-	fmt.Println("/////////////select/////////////")
-	for k, _ := range m {
-		fmt.Println("value", k)
-		fmt.Println(t)
-		for i:=0; i<len(t); i++ {
-			fmt.Print(w.Select(k, i))
-			fmt.Print(" ")
+	fmt.Println("/////////////Quantile/////////////")
+	for l:=0; l<len(t); l++ {
+		for r:=l+1; r<=len(t); r++ {
+			for i:=0; i<r-l; i++ {
+				qt := make([]int, r - l)
+				copy(qt, t[l:r])
+				sort.Ints(qt)
+				if q := w.Quantile(l,r,i); q != qt[i] {
+					fmt.Println(qt)
+					fmt.Println("l,r,i,q,qt[i]")
+					fmt.Println(l,r,i,q,qt[i])
+				}
+			}
 		}
-		fmt.Println()
 	}
 
 }
@@ -181,6 +197,38 @@ func (w WaveletMatrix) Select(value, rank int) int {
 		return index
 	}
 	return out
+}
+
+// l, r are half-open interval. ex) [0, 1)
+// rank is the rank of values in the array in ascending order. 0-origin
+func (w WaveletMatrix) Quantile(l, r, rank int) int {
+	value := 0
+	for i:=len(w.bitVectors)-1; i>=0; i-- {
+		s := w.bitVectors[i]
+		one := 0 // number of 1 in [l, r) of s
+		rightOne := 0 // mumber of 1 in r) of s
+		if r > 0 {
+			rightOne = s.Rank(r - 1)
+			one += rightOne
+		}
+		leftOne := 0 // mumber of 1 in l) of s
+		if l > 0 {
+			leftOne = s.Rank(l - 1)
+			one -= leftOne
+		}
+		zero := r - l - one // number of 0 in [l, r) of s
+		if rank + 1 > zero {
+			value += 1<<i
+			z := w.zeroNums[i]
+			l = z + leftOne
+			r = z + rightOne
+			rank = rank - zero
+		} else {
+			l = l - leftOne
+			r = r - rightOne
+		}
+	}
+	return value
 }
 
 type SuccinctDictionary struct {

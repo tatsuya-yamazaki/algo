@@ -1,76 +1,8 @@
-package main
+package wm
 
 import (
-	"fmt"
 	"sort"
 )
-
-func main() {
-	t := []int{5,4,5,5,2,1,5,6,1,3,5,0}
-	w := NewWaveletMatrix(t)
-	m := make(map[int]struct{})
-	for _, v := range t {
-		m[v] = struct{}{}
-	}
-
-	fmt.Println("/////////////Access/////////////")
-	for i:=0; i<len(t); i++ {
-		if w.Access(i) != t[i] {
-			fmt.Println(i, t[i])
-		}
-	}
-
-	fmt.Println("/////////////Rank/////////////")
-	for k, _ := range m {
-		for i:=0; i<len(t); i++ {
-			c := 0
-			for j:=0; j<=i; j++ {
-				if t[j] == k {
-					c++
-				}
-			}
-			if w.Rank(k,i) != c {
-				fmt.Println(k, i)
-			}
-		}
-	}
-
-	fmt.Println("/////////////Select/////////////")
-	for k, _ := range m {
-		for i:=0; i<len(t); i++ {
-			a := len(t)
-			c := 0
-			for j:=0; j<len(t); j++ {
-				if t[j] == k {
-					c++
-					if i == c - 1 {
-						a = j
-					}
-				}
-			}
-			if w.Select(k, i) != a {
-				fmt.Println(k, i)
-			}
-		}
-	}
-
-	fmt.Println("/////////////Quantile/////////////")
-	for l:=0; l<len(t); l++ {
-		for r:=l+1; r<=len(t); r++ {
-			for i:=0; i<r-l; i++ {
-				qt := make([]int, r - l)
-				copy(qt, t[l:r])
-				sort.Ints(qt)
-				if q := w.Quantile(l,r,i); q != qt[i] {
-					fmt.Println(qt)
-					fmt.Println("l,r,i,q,qt[i]")
-					fmt.Println(l,r,i,q,qt[i])
-				}
-			}
-		}
-	}
-
-}
 
 type WaveletMatrix struct {
 	bitVectors []*SuccinctDictionary
@@ -229,6 +161,67 @@ func (w WaveletMatrix) Quantile(l, r, rank int) int {
 		}
 	}
 	return value
+}
+
+// l, r are half-open interval. ex) [0, 1)
+// k is the number of items you want to be return.
+func (w WaveletMatrix) Topk(l, r, k int) [][]int {
+	type node struct {
+		l, r int // half-open interval [l, r)
+	}
+	func greater(a, b *node) bool {
+		if (a.r - a.l) > (b.r - b.l) {
+			return true
+		}
+		return false
+	}
+	type heap struct {
+		n []*node // 0-origin
+	}
+	func parent(i int) {
+		return (index - 1) / 2
+	}
+	func left(i int) {
+		return i * 2 + 1
+	}
+	func right(i int) {
+		return (i + 1) * 2
+	}
+	func (h *heap) next() bool {
+		return len(h.n) > 0
+	}
+	func (h *heap) add(l, r int) {
+		h.n = append(h.n, &node{l, r})
+		i := len(h.n) - 1
+		for i != 0 {
+			pi := parent(i)
+			p, c := h.n[pi], h.n[i]
+			if greater(p, c) {
+				break
+			}
+			p, c = c, p
+			i = pi
+		}
+	}
+	func (h *heap) pop() *node {
+		ret := h.n[0]
+		last := len(h.n) - 1
+		h.n[0] = h.n[last]
+		h.n := h.n[0:last]
+		i := 0
+		for i < last {
+			li, ri := left(i), right(i)
+			l, r := h.n[l], h.n[r]
+			c := l
+			if greater(r, l) {
+				c = r
+			}
+		}
+	}
+
+	var ret [][]int
+	q := &queue{}
+	q.add(l, r)
 }
 
 type SuccinctDictionary struct {

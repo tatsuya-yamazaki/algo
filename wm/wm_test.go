@@ -1,3 +1,4 @@
+// TODO randomize test data
 package wm
 
 import (
@@ -5,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test(t *testing.T) {
+func TestAccess(t *testing.T) {
 	t := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)
 	m := make(map[int]struct{})
@@ -19,7 +20,7 @@ func Test(t *testing.T) {
 	}
 }
 
-func Test(t *testing.T) {
+func TestRank(t *testing.T) {
 	t := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)
 	m := make(map[int]struct{})
@@ -41,7 +42,7 @@ func Test(t *testing.T) {
 	}
 }
 
-func Test(t *testing.T) {
+func TestSelect(t *testing.T) {
 	t := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)
 	m := make(map[int]struct{})
@@ -67,7 +68,7 @@ func Test(t *testing.T) {
 	}
 }
 
-func Test(t *testing.T) {
+func TestQuantile(t *testing.T) {
 	t := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)
 	m := make(map[int]struct{})

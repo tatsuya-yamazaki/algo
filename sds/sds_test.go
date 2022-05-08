@@ -1,4 +1,5 @@
-//TODO add TestSet
+// TODO randomize test data
+// TODO add TestSet
 package sds
 
 import (

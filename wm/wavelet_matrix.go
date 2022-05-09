@@ -6,10 +6,10 @@ import (
 	"algo/sds"
 )
 
-// WaveletMatrix is struct of data structure of the Wavelet matrix.
+// WaveletMatrix is the struct of the Wavelet matrix.
 // bitVectors is bits of the original slice.
 // zeroNums is the number of zero of the bitsVector.
-// firstIndexes is the index of value in the final slice that is generated from bitVectors.
+// firstIndexes is the first index of values in the final slice that is generated from bitVectors.
 type WaveletMatrix struct {
 	bitVectors []*sds.SuccinctDictionary
 	zeroNums []int

@@ -2,14 +2,21 @@ package wm
 
 import (
 	"sort"
+	"algo/heap"
+	"algo/sds"
 )
 
+// WaveletMatrix is struct of data structure of the Wavelet matrix.
+// bitVectors is bits of the original slice.
+// zeroNums is the number of zero of the bitsVector.
+// firstIndexes is the index of value in the final slice that is generated from bitVectors.
 type WaveletMatrix struct {
-	bitVectors []*SuccinctDictionary
+	bitVectors []*sds.SuccinctDictionary
 	zeroNums []int
 	firstIndexes map[int]int
 }
 
+// NewWaveletMatrix returns pointer of WaveletMatrix.
 func NewWaveletMatrix(t []int) *WaveletMatrix {
 	if len(t) == 0 {
 		return nil
@@ -28,10 +35,10 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	}
 
 	length := topBit + 1
-	w := &WaveletMatrix{make([]*SuccinctDictionary, length), make([]int, length), make(map[int]int)}
+	w := &WaveletMatrix{make([]*sds.SuccinctDictionary, length), make([]int, length), make(map[int]int)}
 
 	type sortInt struct {
-		v, b int
+		v, b int // v is value, b is bit
 	}
 	sis := make([]sortInt, len(t))
 	for i:=0; i<len(t); i++ {
@@ -39,18 +46,18 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	}
 
 	for i:=topBit; i>=0; i-- {
-		s := NewSuccinctDictionary(len(sis))
+		b := sds.NewSuccinctDictionary(len(sis))
 		for j, v := range sis {
 			if v.v & (1<<i) > 0 {
-				s.Set(j, true)
+				b.Set(j, true)
 				sis[j].b = 1
 			} else {
 				sis[j].b = 0
 			}
 		}
-		s.Build()
-		w.bitVectors[i] = s
-		w.zeroNums[i] = s.Size() - s.Rank(s.Size()-1)
+		b.Build()
+		w.bitVectors[i] = b
+		w.zeroNums[i] = b.Size() - b.Rank(b.Size()-1)
 		sort.SliceStable(sis, func(k, l int) bool {return sis[k].b < sis[l].b})
 	}
 	for i:=0; i<len(sis); i++ {
@@ -62,36 +69,40 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	return w
 }
 
+// Access returns original slice item value.
+// index is 0-origin.
 func (w WaveletMatrix) Access(index int) int {
 	r := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
-		s := w.bitVectors[i]
-		if s.Access(index) {
+		b := w.bitVectors[i]
+		if b.Access(index) {
 			r += 1<<i
-			index = w.zeroNums[i] + s.Rank(index) - 1 // 0-origin
+			index = w.zeroNums[i] + b.Rank(index) - 1 // 0-origin
 		} else {
-			index = s.Rank0(index) - 1
+			index = b.Rank0(index) - 1
 		}
 	}
 	return r
 }
 
+// Rank returns number of value appeared in 0 to index in original slice.
+// index is 0-origin.
 func (w WaveletMatrix) Rank(value, index int) int {
 	fi, ok := w.firstIndexes[value]
 	if !ok {
 		return 0
 	}
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
-		s := w.bitVectors[i]
+		b := w.bitVectors[i]
 		if value & (1<<i) > 0 {
-			rank := s.Rank(index)
+			rank := b.Rank(index)
 			// No applicable data
 			if rank == 0 {
 				return 0
 			}
 			index = w.zeroNums[i] + rank - 1 // 0-origin
 		} else {
-			index = s.Rank0(index) - 1
+			index = b.Rank0(index) - 1
 			// No applicable data
 			if index < 0 {
 				return 0
@@ -105,6 +116,7 @@ func (w WaveletMatrix) Rank(value, index int) int {
 	}
 }
 
+// Select returns index of value appeared specified times from original slice index 0.
 // rank is the ascending rank of the values in the array. 0-origin
 func (w WaveletMatrix) Select(value, rank int) int {
 	out := w.bitVectors[0].Size() //out of range
@@ -115,11 +127,11 @@ func (w WaveletMatrix) Select(value, rank int) int {
 	}
 
 	for i:=0; i<len(w.bitVectors); i++ {
-		s := w.bitVectors[i]
+		b := w.bitVectors[i]
 		if value & (1<<i) > 0 {
-			index = s.Select(index + 1 - w.zeroNums[i])
+			index = b.Select(index + 1 - w.zeroNums[i])
 		} else {
-			index = s.Select0(index + 1)
+			index = b.Select0(index + 1)
 		}
 		if out <= index {
 			return out
@@ -131,21 +143,22 @@ func (w WaveletMatrix) Select(value, rank int) int {
 	return out
 }
 
+// Quantile returns nth smallest value in specified interval of the original array.
 // l, r are half-open interval. ex) [0, 1)
 // rank is the rank of values in the array in ascending order. 0-origin
 func (w WaveletMatrix) Quantile(l, r, rank int) int {
 	value := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
-		s := w.bitVectors[i]
+		b := w.bitVectors[i]
 		one := 0 // number of 1 in [l, r) of s
 		rightOne := 0 // mumber of 1 in r) of s
 		if r > 0 {
-			rightOne = s.Rank(r - 1)
+			rightOne = b.Rank(r - 1)
 			one += rightOne
 		}
 		leftOne := 0 // mumber of 1 in l) of s
 		if l > 0 {
-			leftOne = s.Rank(l - 1)
+			leftOne = b.Rank(l - 1)
 			one -= leftOne
 		}
 		zero := r - l - one // number of 0 in [l, r) of s
@@ -163,241 +176,69 @@ func (w WaveletMatrix) Quantile(l, r, rank int) int {
 	return value
 }
 
+// topkNode is used by Topk priority queue
+// It implements heap.Node.
 // l, r are half-open interval. ex) [0, 1)
-// k is the number of items you want to be return.
-func (w WaveletMatrix) Topk(l, r, k int) [][]int {
-	type node struct {
-		l, r int // half-open interval [l, r)
+// i is the index of bitVectors.
+// v is the accumulative value of bit.
+type topkNode struct {
+	l, r, i, v int
+}
+
+// Less returns whether n is less than a or not.
+func (n topkNode) Less(a *heap.Node) bool {
+	v := (*a).(topkNode)
+	return (n.r - n.l) < (v.r - v.l)
+}
+
+// Less returns whether n is greater than a or not.
+func (n topkNode) Greater(a *heap.Node) bool {
+	v := (*a).(topkNode)
+	return (n.r - n.l) > (v.r - v.l)
+}
+
+// Topk returns top k frequent values in [l, r).
+// return array is sort by frequency in descending order,
+// but is not stable original order.
+// l, r are half-open interval. ex) [0, 1).
+// k is the number of items you want to be return. 1-origin.
+func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
+	h := heap.NewHeap(heap.DECENDING)
+	bits := len(w.bitVectors)
+	h.Add(topkNode{l, r, bits-1, 0})
+	bv := make([]int, bits)
+	for i:=0; i<bits; i++ {
+		bv[i] = 1<<i
 	}
-	func greater(a, b *node) bool {
-		if (a.r - a.l) > (b.r - b.l) {
-			return true
+	bl := w.bitVectors[0].Size() - 1 // bitVector last bit index
+	for h.Next() && k > 0 {
+		n := h.Pop().(topkNode)
+		if n.i == -1 {
+			k--
+			ret = append(ret, [2]int{n.v, n.r - n.l})
+			continue
 		}
-		return false
-	}
-	type heap struct {
-		n []*node // 0-origin
-	}
-	func parent(i int) {
-		return (index - 1) / 2
-	}
-	func left(i int) {
-		return i * 2 + 1
-	}
-	func right(i int) {
-		return (i + 1) * 2
-	}
-	func (h *heap) next() bool {
-		return len(h.n) > 0
-	}
-	func (h *heap) add(l, r int) {
-		h.n = append(h.n, &node{l, r})
-		i := len(h.n) - 1
-		for i != 0 {
-			pi := parent(i)
-			p, c := h.n[pi], h.n[i]
-			if greater(p, c) {
-				break
-			}
-			p, c = c, p
-			i = pi
+		b := w.bitVectors[n.i]
+		one := 0 // num of 1 bit [l, r)
+		if n.r > 0 {
+			one += b.Rank(n.r-1)
 		}
-	}
-	func (h *heap) pop() *node {
-		ret := h.n[0]
-		last := len(h.n) - 1
-		h.n[0] = h.n[last]
-		h.n := h.n[0:last]
-		i := 0
-		for i < last {
-			li, ri := left(i), right(i)
-			l, r := h.n[l], h.n[r]
-			c := l
-			if greater(r, l) {
-				c = r
-			}
+		leftOne := 0 // num of 1 bit l)
+		leftZero := 0 // num of 0 bit l)
+		if n.l > 0 {
+			leftOne += b.Rank(n.l-1)
+			one -= leftOne
+			leftZero += b.Rank0(n.l-1)
 		}
-	}
-
-	var ret [][]int
-	q := &queue{}
-	q.add(l, r)
-}
-
-type SuccinctDictionary struct {
-	size int
-	chunks []int // max bits size N is 2**31 - 1 (max int32)
-	blocks []uint16
-	bits   []uint8
-}
-
-// BLOCK_SIZE * m = CHUNK_SIZE (m >= 2)
-// BITS_SIZE * l = BLOCK_SIZE (l >= 2)
-const (
-	CHUNK_SIZE = 1024 // (log2(N+1))**2
-	BLOCK_SIZE = 16   // log2(N+1) / 2
-	BITS_SIZE  = 8    // uint8 size
-)
-
-func NewSuccinctDictionary(size int) *SuccinctDictionary {
-	if size <= 0 || size >= (1<<31) {
-		return nil
-	}
-	s := &SuccinctDictionary{}
-	s.size = size
-	getSuitableLength := func(n int) int {
-		ret := size / n
-		if size%n > 0 {
-			ret++
+		zero := n.r - n.l - one // num of 0 bit [l, r)
+		ni := n.i - 1 // new index of bitVector
+		if zero > 0 {
+			h.Add(topkNode{leftZero, leftZero + zero, ni, n.v})
 		}
-		return ret
-	}
-	s.chunks = make([]int, getSuitableLength(CHUNK_SIZE))
-	s.blocks = make([]uint16, getSuitableLength(BLOCK_SIZE))
-	s.bits = make([]uint8, getSuitableLength(BITS_SIZE))
-	return s
-}
-
-var bitNums = [256]uint8{
-	0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
-	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-	4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8,
-}
-
-func getBit(n int) uint8 {
-	return 1 << (n % BITS_SIZE)
-}
-
-func getChunkIndex(index int) int {
-	return index / CHUNK_SIZE
-}
-
-func getBlockIndex(index int) int {
-	return index / BLOCK_SIZE
-}
-
-func getBitsIndex(index int) int {
-	return index / BITS_SIZE
-}
-
-func (s SuccinctDictionary) Size() int {
-	return s.size
-}
-
-func (s SuccinctDictionary) Access(index int) bool {
-	b := s.bits[getBitsIndex(index)]
-	return b&getBit(index) > 0
-}
-
-func (s *SuccinctDictionary) Set(index int, b bool) {
-	if b == s.Access(index) {
-		return
-	}
-	bit := getBit(index)
-	bits := &s.bits[getBitsIndex(index)]
-	if b {
-		*bits += bit
-		return
-	}
-	*bits -= bit
-}
-
-func (s *SuccinctDictionary) Build() {
-	s.chunks[0] = 0
-	s.blocks[0] = 0
-	ci, bi := 0, 0
-	for i, v := range s.bits {
-		index := i * BITS_SIZE
-		cin := getChunkIndex(index)
-		bin := getBlockIndex(index)
-		if ci < cin {
-			s.chunks[cin] = s.chunks[ci]
-			ci = cin
-			s.blocks[bin] = 0
-			bi = bin
-		}
-		if bi < bin {
-			s.blocks[bin] = s.blocks[bi]
-			bi = bin
-		}
-		c := bitNums[v]
-		s.chunks[ci] += int(c)
-		s.blocks[bi] += uint16(c)
-	}
-}
-
-func (s SuccinctDictionary) Rank(index int) (ret int) {
-	chunkIndex := getChunkIndex(index)
-	if chunkIndex > 0 {
-		ret += int(s.chunks[chunkIndex-1])
-	}
-
-	blockIndex := getBlockIndex(index)
-	if blockIndex > 0 && (BLOCK_SIZE * blockIndex % CHUNK_SIZE != 0) {
-		ret += int(s.blocks[blockIndex-1])
-	}
-
-	bitsIndex := getBitsIndex(index)
-	bits := uint8(s.bits[bitsIndex])
-	for i := uint8(1); (i <= getBit(index) && i > 0); i <<= 1 {
-		if i&bits > 0 {
-			ret++
+		if one > 0 {
+			ol := b.Rank0(bl) + leftOne // new l of first 1 bit
+			h.Add(topkNode{ol, ol+one, ni, n.v + bv[n.i]})
 		}
 	}
-
-	for i := bitsIndex - 1; i >= 0 && blockIndex == getBlockIndex(i*BITS_SIZE); i-- {
-		ret += int(bitNums[s.bits[i]])
-	}
-
-	return ret
-}
-
-// return value is 0-origin index
-func (s SuccinctDictionary) Select(n int) int {
-	l, r := 0, s.size
-	var m int
-	for l < r {
-		m = (l + r) / 2
-		rank := s.Rank(m)
-		if rank < n {
-			l = m + 1
-		} else {
-			r = m
-		}
-	}
-	return l
-}
-
-// index is 0-origin
-func (s SuccinctDictionary) Rank0(index int) int {
-	return index + 1 - s.Rank(index)
-}
-
-// return value is 0-origin index
-func (s SuccinctDictionary) Select0(n int) int {
-	l, r := 0, s.size
-	var m int
-	for l < r {
-		m = (l + r) / 2
-		rank := s.Rank0(m)
-		if rank < n {
-			l = m + 1
-		} else {
-			r = m
-		}
-	}
-	return l
+	return
 }

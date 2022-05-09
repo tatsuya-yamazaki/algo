@@ -23,7 +23,7 @@ type Heap struct {
 
 const(
 	ASCENDING = true
-	DECENDING = false
+	DESCENDING = false
 )
 
 func NewHeap(ascending bool) *Heap {

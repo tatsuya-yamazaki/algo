@@ -203,7 +203,7 @@ func (n topkNode) Greater(a *heap.Node) bool {
 // l, r are half-open interval. ex) [0, 1).
 // k is the number of items you want to be return. 1-origin.
 func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
-	h := heap.NewHeap(heap.DECENDING)
+	h := heap.NewHeap(heap.DESCENDING)
 	bits := len(w.bitVectors)
 	h.Add(topkNode{l, r, bits-1, 0})
 	bv := make([]int, bits)

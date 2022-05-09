@@ -24,13 +24,11 @@ func (n node) Greater(a *Node) bool {
 func TestAcsending(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	var te []int
-	ha := NewHeap(true)
-	hd := NewHeap(false)
+	ha := NewHeap(ASCENDING)
 	for i:=0; i<100; i++ {
 		v := rand.Intn(100)
 		te = append(te, v)
 		ha.Add(node{v})
-		hd.Add(node{v})
 	}
 
 	sort.Ints(te)
@@ -49,12 +47,10 @@ func TestAcsending(t *testing.T) {
 func TestDescsending(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	var te []int
-	ha := NewHeap(true)
-	hd := NewHeap(false)
+	hd := NewHeap(DESCENDING)
 	for i:=0; i<100; i++ {
 		v := rand.Intn(100)
 		te = append(te, v)
-		ha.Add(node{v})
 		hd.Add(node{v})
 	}
 

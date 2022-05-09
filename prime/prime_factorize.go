@@ -1,14 +1,8 @@
-package main
+package prime
 
 import(
-	"fmt"
 	"math"
 )
-
-func main() {
-	fmt.Println(PrimeFactorize(138600))
-	fmt.Println(PrimeFactorize(1000000007))
-}
 
 func PrimeFactorize(n int) (ret [][2]int) {
 	root := int(math.Sqrt(float64(n)))

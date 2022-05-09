@@ -1,4 +1,4 @@
-// TODO randomize test data
+// TODO randomize test data. create function generateRandomData.
 package wm
 
 import (

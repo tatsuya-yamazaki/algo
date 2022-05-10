@@ -208,3 +208,24 @@ func TestTopkWithOverk(t *testing.T) {
 		}
 	}
 }
+
+// TestSum checks whether Sum returns summary of value in [l, r) of the original slice.
+func TestSum(t *testing.T) {
+	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
+	w := NewWaveletMatrix(s)
+	for l:=0; l<len(s); l++ {
+		for r:=l+1; r<=len(s); r++ {
+			si := make([]int, r - l)
+			copy(si, s[l:r])
+			e := 0
+			for _, v := range si {
+				e += v
+			}
+			if a := w.Sum(l, r); e != a {
+				t.Errorf("si == %v", si)
+				t.Errorf("l == %v, r == %v", l, r)
+				t.Errorf("%v != %v", e, a)
+			}
+		}
+	}
+}

@@ -242,3 +242,13 @@ func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 	}
 	return
 }
+
+// Topk returns sum of value in [l, r).
+// l, r are half-open interval. ex) [0, 1).
+func (w WaveletMatrix) Sum(l, r int) (ret int) {
+	k := r - l
+	for _, v := range w.Topk(l, r, k) {
+		ret += v[0] * v[1]
+	}
+	return
+}

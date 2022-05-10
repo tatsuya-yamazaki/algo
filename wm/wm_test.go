@@ -209,7 +209,7 @@ func TestTopkWithOverk(t *testing.T) {
 	}
 }
 
-// TestSum checks whether Sum returns summary of value in [l, r) of the original slice.
+// TestSum checks whether Sum returns summary of value in [l, r) or not
 func TestSum(t *testing.T) {
 	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)

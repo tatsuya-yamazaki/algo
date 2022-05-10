@@ -4,6 +4,7 @@ import (
 	"sort"
 	"algo/heap"
 	"algo/sds"
+	"algo/que"
 )
 
 // WaveletMatrix is the struct of the Wavelet matrix.
@@ -250,5 +251,20 @@ func (w WaveletMatrix) Sum(l, r int) (ret int) {
 	for _, v := range w.Topk(l, r, k) {
 		ret += v[0] * v[1]
 	}
+	return
+}
+
+// intersectNode is used by Intersect queue
+// It implements queue.Node.
+// l1, r1 are half-open interval. ex) [0, 1).
+// l2, r2 are half-open interval. ex) [0, 1).
+type topkNode struct {
+	l1, r1, l2, r2, v int
+}
+
+// Intersect returns the common values and their frequency in [l1, r1) and [l2, r2).
+// l1, r1 are half-open interval. ex) [0, 1).
+// l2, r2 are half-open interval. ex) [0, 1).
+func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
 	return
 }

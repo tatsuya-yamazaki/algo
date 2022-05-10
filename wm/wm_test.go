@@ -229,3 +229,51 @@ func TestSum(t *testing.T) {
 		}
 	}
 }
+
+// TestIntersect checks whether Intersect returns common values and its frequency in [l1, r1) and [l2, r2) or not.
+func TestIntersect(t *testing.T) {
+	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
+	w := NewWaveletMatrix(s)
+	for l1:=0; l1<len(s); l1++ {
+		for r1:=l1+1; r1<=len(s); r1++ {
+			for l2:=0; l2<len(s); l2++ {
+				for r2:=l2+1; r2<=len(s); r2++ {
+					si1 := make([]int, r1 - l1)
+					copy(si1, s[l1:r1])
+					m1 := make(map[int]int)
+					for _, v := range si1 {
+						m1[v]++
+					}
+
+					si2 := make([]int, r2 - l2)
+					copy(si2, s[l2:r2])
+					m2 := make(map[int]int)
+					for _, v := range si2 {
+						m2[v]++
+					}
+
+					e := make([][3]int, 0)
+					for k, v1 := range m1 {
+						v2, ok := m2[k]
+						if ok {
+							e = append(e, [3]int{k, v1, v2})
+						}
+					}
+
+					a := w.Intersect(l1, r1, l2, r2)
+
+					sort.Slice(e, func(i, j int) bool { return e[i][0] < e[j][0] })
+					sort.Slice(a, func(i, j int) bool { return e[i][0] < e[j][0] })
+
+					if !reflect.DeepEqual(e, a) {
+						t.Errorf("si1 == %v", si1)
+						t.Errorf("si2 == %v", si2)
+						t.Errorf("l1 == %v, r1 == %v, l2 == %v, r2 == %v", l1, r1, l2, r2)
+						t.Errorf("%v != %v", e, a)
+					}
+				}
+			}
+		}
+	}
+}
+

@@ -258,7 +258,7 @@ func (w WaveletMatrix) Sum(l, r int) (ret int) {
 // It implements queue.Node.
 // l1, r1 are half-open interval. ex) [0, 1).
 // l2, r2 are half-open interval. ex) [0, 1).
-type topkNode struct {
+type intersectNode struct {
 	l1, r1, l2, r2, v int
 }
 

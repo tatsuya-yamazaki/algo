@@ -11,12 +11,12 @@ type node struct {
 	a int
 }
 
-func (n node) Less(a *Node) bool {
+func (n node) Less(a *HeapNode) bool {
 	v := (*a).(node)
 	return n.a < v.a
 }
 
-func (n node) Greater(a *Node) bool {
+func (n node) Greater(a *HeapNode) bool {
 	v := (*a).(node)
 	return n.a > v.a
 }

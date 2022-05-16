@@ -5,9 +5,9 @@ package heap
 // Node is the interface a node of Heap.
 // Less returns Node is less than a or not.
 // Greater returns Node is greater than a or not.
-type Node interface {
-	Less(a *Node) bool
-	Greater(a *Node) bool
+type HeapNode interface {
+	Less(a *HeapNode) bool
+	Greater(a *HeapNode) bool
 }
 
 // Heap is the binary heap structure.
@@ -17,7 +17,7 @@ type Node interface {
 // TODO It may need to be refactored, expecially Pop().
 // TODO It may need to be devided into min heap and max heap. Then remove isChild, use Less or Greater
 type Heap struct {
-	n []*Node
+	n []*HeapNode
 	isChild func(parent, child int) bool
 }
 
@@ -27,7 +27,7 @@ const(
 )
 
 func NewHeap(ascending bool) *Heap {
-	h := &Heap{make([]*Node, 0), nil}
+	h := &Heap{make([]*HeapNode, 0), nil}
 	if ascending {
 		h.isChild = func(parent, child int) bool { return (*h.n[parent]).Less(h.n[child]) }
 	} else {
@@ -48,7 +48,7 @@ func right(i int) int {
 	return (i + 1) * 2
 }
 
-func (h *Heap) Add(value Node) {
+func (h *Heap) Add(value HeapNode) {
 	h.n = append(h.n, &value)
 	i := len(h.n) - 1
 	for i != 0 {
@@ -61,11 +61,11 @@ func (h *Heap) Add(value Node) {
 	}
 }
 
-func (h *Heap) Top() *Node {
+func (h *Heap) Top() *HeapNode {
 	return h.n[0]
 }
 
-func (h *Heap) Pop() Node {
+func (h *Heap) Pop() HeapNode {
 	ret := h.n[0]
 	last := len(h.n)-1
 	h.n[0] = h.n[last]

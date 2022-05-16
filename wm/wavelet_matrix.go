@@ -4,7 +4,7 @@ import (
 	"sort"
 	"algo/heap"
 	"algo/sds"
-	"algo/que"
+	//"algo/que"
 )
 
 // WaveletMatrix is the struct of the Wavelet matrix.
@@ -187,13 +187,13 @@ type topkNode struct {
 }
 
 // Less returns whether n is less than a or not.
-func (n topkNode) Less(a *heap.Node) bool {
+func (n topkNode) Less(a *heap.HeapNode) bool {
 	v := (*a).(topkNode)
 	return (n.r - n.l) < (v.r - v.l)
 }
 
 // Less returns whether n is greater than a or not.
-func (n topkNode) Greater(a *heap.Node) bool {
+func (n topkNode) Greater(a *heap.HeapNode) bool {
 	v := (*a).(topkNode)
 	return (n.r - n.l) > (v.r - v.l)
 }
@@ -266,6 +266,6 @@ type intersectNode struct {
 // Intersect returns the common values and their frequency in [l1, r1) and [l2, r2).
 // l1, r1 are half-open interval. ex) [0, 1).
 // l2, r2 are half-open interval. ex) [0, 1).
-func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
-	return
-}
+//func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
+	//return
+//}

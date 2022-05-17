@@ -230,7 +230,6 @@ func TestSum(t *testing.T) {
 	}
 }
 
-/*
 // TestIntersect checks whether Intersect returns common values and its frequency in [l1, r1) and [l2, r2) or not.
 func TestIntersect(t *testing.T) {
 	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
@@ -253,7 +252,7 @@ func TestIntersect(t *testing.T) {
 						m2[v]++
 					}
 
-					e := make([][3]int, 0)
+					var e [][3]int
 					for k, v1 := range m1 {
 						v2, ok := m2[k]
 						if ok {
@@ -270,11 +269,12 @@ func TestIntersect(t *testing.T) {
 						t.Errorf("si1 == %v", si1)
 						t.Errorf("si2 == %v", si2)
 						t.Errorf("l1 == %v, r1 == %v, l2 == %v, r2 == %v", l1, r1, l2, r2)
+						t.Errorf("%T != %T", e, a)
 						t.Errorf("%v != %v", e, a)
+						t.Errorf("len %v != %v", len(e), len(a))
 					}
 				}
 			}
 		}
 	}
 }
-*/

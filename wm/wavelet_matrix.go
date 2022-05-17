@@ -4,7 +4,7 @@ import (
 	"sort"
 	"algo/heap"
 	"algo/sds"
-	//"algo/que"
+	"algo/que"
 )
 
 // WaveletMatrix is the struct of the Wavelet matrix.
@@ -255,17 +255,59 @@ func (w WaveletMatrix) Sum(l, r int) (ret int) {
 }
 
 // intersectNode is used by Intersect queue
-// It implements queue.Node.
+// It implements que.QueueValue.
 // l1, r1 are half-open interval. ex) [0, 1).
 // l2, r2 are half-open interval. ex) [0, 1).
+// i is the index of bitVectors.
 // v is the accumulative value of bit.
-type intersectNode struct {
-	l1, r1, l2, r2, v int
+type intersectValue struct {
+	l1, r1, l2, r2, i, v int
 }
 
 // Intersect returns the common values and their frequency in [l1, r1) and [l2, r2).
-// l1, r1 are half-open interval. ex) [0, 1).
-// l2, r2 are half-open interval. ex) [0, 1).
-//func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
-	//return
-//}
+// l1, r1 are half-open interval. ex) [0, 1). 0-origin
+// l2, r2 are half-open interval. ex) [0, 1). 0-origin
+func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
+	q := que.NewQueue()
+	q.Add(intersectValue{l1, r1, l2, r2, len(w.bitVectors)-1, 0})
+	for q.Next() {
+		v := q.Pop().(intersectValue)
+		n1 := v.r1 - v.l1 // length of [l1, r1)
+		n2 := v.r2 - v.l2 // length of [l2, r2)
+		// If there are no common values.
+		if n1 == 0 || n2 == 0 {
+			continue
+		}
+		if v.i == -1 {
+			ret = append(ret, [3]int{v.v, n1, n2})
+			continue
+		}
+
+		b := w.bitVectors[v.i]
+		// n1 are not 0, so v.r1 are not 0.
+		one1 := b.Rank(v.r1 - 1) // number of one in v.r1)
+		leftOne1 := 0 // number of one in v.l1)
+		if v.l1 > 0 {
+			leftOne1 += b.Rank(v.l1 - 1)
+		}
+		leftZero1 := v.l1 - leftOne1 // number of zero in v.l1)
+		zero1 := v.r1 - one1 // number of zero in v.r1)
+
+		// n2 are not 0, so v.r2 are not 0.
+		one2 := b.Rank(v.r2 - 1) // number of one in v.r2)
+		leftOne2 := 0 // number of one in v.l2)
+		if v.l2 > 0 {
+			leftOne2 += b.Rank(v.l2 - 1)
+		}
+		leftZero2 := v.l2 - leftOne2 // number of zero in v.l2)
+		zero2 := v.r2 - one2 // number of zero in v.r2)
+
+		zero := b.Rank0(b.Size()-1) // number of zero in b
+		bit := 1 << v.i
+		v.i-- // next index of bitVectors
+
+		q.Add(intersectValue{leftZero1, zero1, leftZero2, zero2, v.i, v.v})
+		q.Add(intersectValue{zero+leftOne1, zero+one1, zero+leftOne2, zero+one2, v.i, v.v+bit})
+	}
+	return
+}

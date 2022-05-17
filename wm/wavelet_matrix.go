@@ -178,7 +178,7 @@ func (w WaveletMatrix) Quantile(l, r, rank int) int {
 }
 
 // topkNode is used by Topk priority queue
-// It implements heap.Node.
+// It implements heap.HeapNode.
 // l, r are half-open interval. ex) [0, 1)
 // i is the index of bitVectors.
 // v is the accumulative value of bit.

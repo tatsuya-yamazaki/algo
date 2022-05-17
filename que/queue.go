@@ -1,32 +1,8 @@
-package main
-
-import(
-	"fmt"
-)
-
-func main() {
-	q := NewQueue()
-
-	q.Push(1)
-	q.Push(2)
-	q.Push(3)
-	q.Push(4)
-	for q.Next() {
-		fmt.Println(q.Pop())
-	}
-
-	q.Push(5)
-	q.Push(6)
-	q.Push(7)
-	q.Push(8)
-	for q.Next() {
-		fmt.Println(q.Pop())
-	}
-}
+package que
 
 type Queue struct {
-	begin *LinkedList
-	end *LinkedList
+	begin *queueLinkedList
+	end *queueLinkedList
 }
 
 func NewQueue() *Queue {
@@ -40,8 +16,8 @@ func (q *Queue) Next() bool {
 	return true
 }
 
-func (q *Queue) Push(value int) {
-	ll := &LinkedList{q.end, nil, value}
+func (q *Queue) Push(value QueueValue) {
+	ll := &queueLinkedList{q.end, nil, value}
 	if q.end == nil {
 		q.begin = ll
 	} else {
@@ -50,7 +26,7 @@ func (q *Queue) Push(value int) {
 	q.end = ll
 }
 
-func (q *Queue) Pop() int {
+func (q *Queue) Pop() QueueValue {
 	value := q.begin.value
 	if q.begin == q.end {
 		q.begin = nil
@@ -62,7 +38,10 @@ func (q *Queue) Pop() int {
 	return value
 }
 
-type LinkedList struct {
-        prev, next *LinkedList
-	value int
+type QueueValue interface {
+}
+
+type queueLinkedList struct {
+        prev, next *queueLinkedList
+	value QueueValue
 }

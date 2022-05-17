@@ -1,77 +1,8 @@
-package main
-
-import(
-	"fmt"
-)
-
-func main() {
-	d := NewDeque()
-
-	d.PushLeft(1)
-	d.PushLeft(2)
-	d.PushLeft(3)
-	d.PushLeft(4)
-	d.PushLeft(5)
-	d.PushLeft(6)
-	d.PushLeft(7)
-	d.PushLeft(8)
-	for d.Next() {
-		fmt.Println(d.PopRight())
-	}
-
-	d.PushLeft(1)
-	d.PushLeft(2)
-	d.PushLeft(3)
-	d.PushLeft(4)
-	d.PushLeft(5)
-	d.PushLeft(6)
-	d.PushLeft(7)
-	d.PushLeft(8)
-	for d.Next() {
-		fmt.Println(d.PopLeft())
-	}
-
-	d.PushRight(1)
-	d.PushRight(2)
-	d.PushRight(3)
-	d.PushRight(4)
-	d.PushRight(5)
-	d.PushRight(6)
-	d.PushRight(7)
-	d.PushRight(8)
-	for d.Next() {
-		fmt.Println(d.PopRight())
-	}
-
-	d.PushRight(1)
-	d.PushRight(2)
-	d.PushRight(3)
-	d.PushRight(4)
-	d.PushRight(5)
-	d.PushRight(6)
-	d.PushRight(7)
-	d.PushRight(8)
-	for d.Next() {
-		fmt.Println(d.PopLeft())
-	}
-
-	d.PushLeft(1)
-	d.PushRight(2)
-	d.PushLeft(3)
-	d.PushRight(4)
-	d.PushLeft(5)
-	d.PushRight(6)
-	d.PushLeft(7)
-	d.PushRight(8)
-	for d.Next() {
-		fmt.Println(d.PopLeft())
-	}
-
-}
+package que
 
 type Deque struct {
-	begin *LinkedList
-	end *LinkedList
+	begin *dequeLinkedList
+	end *dequeLinkedList
 }
 
 func NewDeque() *Deque {
@@ -85,8 +16,8 @@ func (d *Deque) Next() bool {
 	return true
 }
 
-func (d *Deque) PushLeft(value int) {
-	ll := &LinkedList{nil, d.begin, value}
+func (d *Deque) PushLeft(value DequeValue) {
+	ll := &dequeLinkedList{nil, d.begin, value}
 	if d.begin == nil {
 		d.end = ll
 	} else {
@@ -95,8 +26,8 @@ func (d *Deque) PushLeft(value int) {
 	d.begin = ll
 }
 
-func (d *Deque) PushRight(value int) {
-	ll := &LinkedList{d.end, nil, value}
+func (d *Deque) PushRight(value DequeValue) {
+	ll := &dequeLinkedList{d.end, nil, value}
 	if d.end == nil {
 		d.begin = ll
 	} else {
@@ -105,7 +36,7 @@ func (d *Deque) PushRight(value int) {
 	d.end = ll
 }
 
-func (d *Deque) PopLeft() int {
+func (d *Deque) PopLeft() DequeValue {
 	value := d.begin.value
 	if d.begin == d.end {
 		d.begin = nil
@@ -117,7 +48,7 @@ func (d *Deque) PopLeft() int {
 	return value
 }
 
-func (d *Deque) PopRight() int {
+func (d *Deque) PopRight() DequeValue {
 	value := d.end.value
 	if d.begin == d.end {
 		d.begin = nil
@@ -129,7 +60,10 @@ func (d *Deque) PopRight() int {
 	return value
 }
 
-type LinkedList struct {
-        prev, next *LinkedList
-	value int
+type DequeValue interface {
+}
+
+type dequeLinkedList struct {
+        prev, next *dequeLinkedList
+	value DequeValue
 }

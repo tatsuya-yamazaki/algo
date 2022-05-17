@@ -17,7 +17,7 @@ func TestQueue(t *testing.T) {
 	e := []queueValue{{1},{2},{3},{4},{5},{6},{7},{8}}
 	q := NewQueue()
 	for _, v := range e {
-		q.Push(v)
+		q.Add(v)
 	}
 
 	a := make([]queueValue, 0)
@@ -30,11 +30,11 @@ func TestQueue(t *testing.T) {
 	}
 }
 
-func TestDequePushLeftPopRight(t *testing.T) {
+func TestDequeAddLeftPopRight(t *testing.T) {
 	e := []dequeValue{{1},{2},{3},{4},{5},{6},{7},{8}}
 	d := NewDeque()
 	for _, v := range e {
-		d.PushLeft(v)
+		d.AddLeft(v)
 	}
 
 	a := make([]dequeValue, 0)
@@ -47,11 +47,11 @@ func TestDequePushLeftPopRight(t *testing.T) {
 	}
 }
 
-func TestDequePushLeftPopLeft(t *testing.T) {
+func TestDequeAddLeftPopLeft(t *testing.T) {
 	e := []dequeValue{{1},{2},{3},{4},{5},{6},{7},{8}}
 	d := NewDeque()
 	for _, v := range e {
-		d.PushLeft(v)
+		d.AddLeft(v)
 	}
 
 	a := make([]dequeValue, len(e))
@@ -66,11 +66,11 @@ func TestDequePushLeftPopLeft(t *testing.T) {
 	}
 }
 
-func TestDequePushRightPopLeft(t *testing.T) {
+func TestDequeAddRightPopLeft(t *testing.T) {
 	e := []dequeValue{{1},{2},{3},{4},{5},{6},{7},{8}}
 	d := NewDeque()
 	for _, v := range e {
-		d.PushRight(v)
+		d.AddRight(v)
 	}
 
 	a := make([]dequeValue, 0)
@@ -83,11 +83,11 @@ func TestDequePushRightPopLeft(t *testing.T) {
 	}
 }
 
-func TestDequePushRightPopRight(t *testing.T) {
+func TestDequeAddRightPopRight(t *testing.T) {
 	e := []dequeValue{{1},{2},{3},{4},{5},{6},{7},{8}}
 	d := NewDeque()
 	for _, v := range e {
-		d.PushRight(v)
+		d.AddRight(v)
 	}
 
 	a := make([]dequeValue, len(e))

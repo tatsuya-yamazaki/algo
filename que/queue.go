@@ -16,7 +16,7 @@ func (q *Queue) Next() bool {
 	return true
 }
 
-func (q *Queue) Push(value QueueValue) {
+func (q *Queue) Add(value QueueValue) {
 	ll := &queueLinkedList{q.end, nil, value}
 	if q.end == nil {
 		q.begin = ll

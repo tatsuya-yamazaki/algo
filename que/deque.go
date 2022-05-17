@@ -16,7 +16,7 @@ func (d *Deque) Next() bool {
 	return true
 }
 
-func (d *Deque) PushLeft(value DequeValue) {
+func (d *Deque) AddLeft(value DequeValue) {
 	ll := &dequeLinkedList{nil, d.begin, value}
 	if d.begin == nil {
 		d.end = ll
@@ -26,7 +26,7 @@ func (d *Deque) PushLeft(value DequeValue) {
 	d.begin = ll
 }
 
-func (d *Deque) PushRight(value DequeValue) {
+func (d *Deque) AddRight(value DequeValue) {
 	ll := &dequeLinkedList{d.end, nil, value}
 	if d.end == nil {
 		d.begin = ll

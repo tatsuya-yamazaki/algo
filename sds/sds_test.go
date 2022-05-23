@@ -39,9 +39,9 @@ func TestRank(t *testing.T) {
 		s.Set(i, true)
 	}
 	s.Build()
-	for i:=0; i<1038; i++ {
-		if a := s.Rank(i); i + 1 != a {
-			t.Errorf("%v != %v", i + 1, a)
+	for i:=0; i<=1038; i++ {
+		if a := s.Rank(i); i != a {
+			t.Errorf("%v != %v", i, a)
 		}
 	}
 }
@@ -49,9 +49,9 @@ func TestRank(t *testing.T) {
 func TestRank0(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
 	s.Build()
-	for i:=0; i<1038; i++ {
-		if a := s.Rank0(i); i + 1 != a {
-			t.Errorf("%v != %v", i + 1, a)
+	for i:=0; i<=1038; i++ {
+		if a := s.Rank0(i); i != a {
+			t.Errorf("%v != %v", i, a)
 		}
 	}
 }
@@ -62,8 +62,8 @@ func TestSelect(t *testing.T) {
 		s.Set(i, true)
 	}
 	s.Build()
-	for i:=0; i<1038; i++ {
-		if a := s.Select(i + 1); i != a {
+	for i:=0; i<=1038; i++ {
+		if a := s.Select(i); i != a {
 			t.Errorf("%v != %v", i, a)
 		}
 	}
@@ -72,8 +72,8 @@ func TestSelect(t *testing.T) {
 func TestSelect0(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
 	s.Build()
-	for i:=0; i<1038; i++ {
-		if a := s.Select0(i + 1); i != a {
+	for i:=0; i<=1038; i++ {
+		if a := s.Select0(i); i != a {
 			t.Errorf("%v != %v", i, a)
 		}
 	}

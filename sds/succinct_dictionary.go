@@ -115,7 +115,12 @@ func (s *SuccinctDictionary) Build() {
 	}
 }
 
-func (s SuccinctDictionary) Rank(index int) (ret int) {
+// Rank returns 1 bit num in [0, r)
+func (s SuccinctDictionary) Rank(r int) (ret int) {
+	if r < 1 {
+		return 0
+	}
+	index := r - 1
 	chunkIndex := getChunkIndex(index)
 	if chunkIndex > 0 {
 		ret += int(s.chunks[chunkIndex-1])
@@ -141,12 +146,21 @@ func (s SuccinctDictionary) Rank(index int) (ret int) {
 	return ret
 }
 
-// return value is 0-origin index
+// Rank returns 0 bit num in [0, r)
+func (s SuccinctDictionary) Rank0(r int) int {
+	if r < 1 {
+		return 0
+	}
+	return r - s.Rank(r)
+}
+
+// Select returns index where 1 bit appears n times.
+// The index is 1-indexed.
+// If the real index is i, it returns i + 1.
 func (s SuccinctDictionary) Select(n int) int {
 	l, r := 0, s.size
-	var m int
 	for l < r {
-		m = (l + r) / 2
+		m := (l + r) / 2
 		rank := s.Rank(m)
 		if rank < n {
 			l = m + 1
@@ -157,17 +171,13 @@ func (s SuccinctDictionary) Select(n int) int {
 	return l
 }
 
-// index is 0-origin
-func (s SuccinctDictionary) Rank0(index int) int {
-	return index + 1 - s.Rank(index)
-}
-
-// return value is 0-origin index
+// Select returns index where 0 bit appears n times.
+// The index is 1-indexed.
+// If the real index is i, it returns i + 1.
 func (s SuccinctDictionary) Select0(n int) int {
 	l, r := 0, s.size
-	var m int
 	for l < r {
-		m = (l + r) / 2
+		m := (l + r) / 2
 		rank := s.Rank0(m)
 		if rank < n {
 			l = m + 1

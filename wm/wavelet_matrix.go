@@ -1,6 +1,7 @@
 package wm
 
 import (
+	"fmt"
 	"sort"
 	"algo/heap"
 	"algo/sds"
@@ -50,7 +51,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		b := sds.NewSuccinctDictionary(len(sis))
 		for j, v := range sis {
 			if v.v & (1<<i) > 0 {
-				b.Set(j, true)
+				b.Set(j + 1, true)
 				sis[j].b = 1
 			} else {
 				sis[j].b = 0
@@ -58,7 +59,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		}
 		b.Build()
 		w.bitVectors[i] = b
-		w.zeroNums[i] = b.Size() - b.Rank(b.Size()-1)
+		w.zeroNums[i] = b.Rank0(b.Size())
 		sort.SliceStable(sis, func(k, l int) bool {return sis[k].b < sis[l].b})
 	}
 	for i:=0; i<len(sis); i++ {
@@ -71,23 +72,22 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 }
 
 // Access returns original slice item value.
-// index is 0-origin.
+// index is 1-indexed.
 func (w WaveletMatrix) Access(index int) int {
 	r := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
 		b := w.bitVectors[i]
 		if b.Access(index) {
 			r += 1<<i
-			index = w.zeroNums[i] + b.Rank(index) - 1 // 0-origin
+			index = w.zeroNums[i] + b.Rank(index)
 		} else {
-			index = b.Rank0(index) - 1
+			index = b.Rank0(index)
 		}
 	}
 	return r
 }
 
-// Rank returns number of value appeared in 0 to index in original slice.
-// index is 0-origin.
+// Rank returns number of value appeared the interval [0, index) in original slice.
 func (w WaveletMatrix) Rank(value, index int) int {
 	fi, ok := w.firstIndexes[value]
 	if !ok {
@@ -101,25 +101,29 @@ func (w WaveletMatrix) Rank(value, index int) int {
 			if rank == 0 {
 				return 0
 			}
-			index = w.zeroNums[i] + rank - 1 // 0-origin
+			index = w.zeroNums[i] + rank // 1-indexed
 		} else {
-			index = b.Rank0(index) - 1
+			index = b.Rank0(index) // 1-indexed
 			// No applicable data
-			if index < 0 {
+			if index == 0 {
 				return 0
 			}
 		}
 	}
-	if index < fi {
+	ret := index - fi
+	if index < 0 {
 		return 0
 	} else {
-		return index - fi + 1
+		return ret
 	}
 }
 
 // Select returns index of value appeared specified times from original slice index 0.
-// rank is the ascending rank of the values in the array. 0-origin
+// rank is the ascending rank of the values in the array. 0-indexed
 func (w WaveletMatrix) Select(value, rank int) int {
+	//////// remove fmt /////
+	fmt.Println(rank)
+	//////// remove fmt /////
 	out := w.bitVectors[0].Size() //out of range
 	fi, ok := w.firstIndexes[value]
 	index := fi + rank
@@ -146,7 +150,7 @@ func (w WaveletMatrix) Select(value, rank int) int {
 
 // Quantile returns nth smallest value in specified interval of the original array.
 // l, r are half-open interval. ex) [0, 1)
-// rank is the rank of values in the array in ascending order. 0-origin
+// rank is the rank of values in the array in ascending order. 0-indexed
 func (w WaveletMatrix) Quantile(l, r, rank int) int {
 	value := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
@@ -202,7 +206,7 @@ func (n topkNode) Greater(a *heap.HeapNode) bool {
 // return array is sort by frequency in descending order,
 // but is not stable original order.
 // l, r are half-open interval. ex) [0, 1).
-// k is the number of items you want to be return. 1-origin.
+// k is the number of items you want to be return. 1-indexed.
 func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 	h := heap.NewHeap(heap.DESCENDING)
 	bits := len(w.bitVectors)
@@ -265,8 +269,8 @@ type intersectValue struct {
 }
 
 // Intersect returns the common values and their frequency in [l1, r1) and [l2, r2).
-// l1, r1 are half-open interval. ex) [0, 1). 0-origin
-// l2, r2 are half-open interval. ex) [0, 1). 0-origin
+// l1, r1 are half-open interval. ex) [0, 1). 0-indexed
+// l2, r2 are half-open interval. ex) [0, 1). 0-indexed
 func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
 	q := que.NewQueue()
 	q.Add(intersectValue{l1, r1, l2, r2, len(w.bitVectors)-1, 0})

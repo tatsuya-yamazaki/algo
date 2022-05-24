@@ -73,15 +73,19 @@ func (s SuccinctDictionary) Size() int {
 	return s.size
 }
 
+// index is 1-indexed
 func (s SuccinctDictionary) Access(index int) bool {
+	index-- // fix to 0-indexed
 	b := s.bits[getBitsIndex(index)]
 	return b&getBit(index) > 0
 }
 
+// index is 1-indexed
 func (s *SuccinctDictionary) Set(index int, b bool) {
 	if b == s.Access(index) {
 		return
 	}
+	index-- // fix to 0-indexed
 	bit := getBit(index)
 	bits := &s.bits[getBitsIndex(index)]
 	if b {

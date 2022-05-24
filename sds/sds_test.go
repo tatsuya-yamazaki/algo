@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAccess(t *testing.T) {
+func TestSetAccess(t *testing.T) {
 	s := NewSuccinctDictionary(8)
 	s.Set(7, true)
 	s.Build()
@@ -35,7 +35,7 @@ func TestAccess(t *testing.T) {
 
 func TestRank(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
-	for i:=0; i<1038; i++ {
+	for i:=1; i<=1038; i++ {
 		s.Set(i, true)
 	}
 	s.Build()
@@ -58,7 +58,7 @@ func TestRank0(t *testing.T) {
 
 func TestSelect(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
-	for i:=0; i<1038; i++ {
+	for i:=1; i<=1038; i++ {
 		s.Set(i, true)
 	}
 	s.Build()

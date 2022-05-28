@@ -191,9 +191,6 @@ func (n topkNode) Greater(a *heap.HeapNode) bool {
 // l, r are half-open interval. ex) [0, 1).
 // k is the number of items you want to be return. 1-indexed.
 func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
-	//////// remove fmt /////
-	fmt.Println(k)
-	//////// remove fmt /////
 	h := heap.NewHeap(heap.DESCENDING)
 	bits := len(w.bitVectors)
 	h.Add(topkNode{l, r, bits-1, 0})
@@ -201,7 +198,6 @@ func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 	for i:=0; i<bits; i++ {
 		bv[i] = 1<<i
 	}
-	bl := w.bitVectors[0].Size() - 1 // bitVector last bit index
 	for h.Next() && k > 0 {
 		n := h.Pop().(topkNode)
 		if n.i == -1 {
@@ -210,24 +206,16 @@ func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 			continue
 		}
 		b := w.bitVectors[n.i]
-		one := 0 // num of 1 bit [l, r)
-		if n.r > 0 {
-			one += b.Rank(n.r-1)
-		}
-		leftOne := 0 // num of 1 bit l)
-		leftZero := 0 // num of 0 bit l)
-		if n.l > 0 {
-			leftOne += b.Rank(n.l-1)
-			one -= leftOne
-			leftZero += b.Rank0(n.l-1)
-		}
+		leftOne := b.Rank(n.l) // num of 1 bit l)
+		leftZero := n.l - leftOne // num of 0 bit l)
+		one := b.Rank(n.r) - leftOne // num of 1 bit [l, r)
 		zero := n.r - n.l - one // num of 0 bit [l, r)
 		ni := n.i - 1 // new index of bitVector
 		if zero > 0 {
 			h.Add(topkNode{leftZero, leftZero + zero, ni, n.v})
 		}
 		if one > 0 {
-			ol := b.Rank0(bl) + leftOne // new l of first 1 bit
+			ol := w.zeroNums[n.i] + leftOne // new l of first 1 bit
 			h.Add(topkNode{ol, ol+one, ni, n.v + bv[n.i]})
 		}
 	}
@@ -237,6 +225,9 @@ func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 // Topk returns sum of value in [l, r).
 // l, r are half-open interval. ex) [0, 1).
 func (w WaveletMatrix) Sum(l, r int) (ret int) {
+	//////// remove fmt /////
+	fmt.Println(r)
+	//////// remove fmt /////
 	k := r - l
 	for _, v := range w.Topk(l, r, k) {
 		ret += v[0] * v[1]

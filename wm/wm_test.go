@@ -3,7 +3,7 @@ package wm
 
 import (
 	//"reflect"
-	//"sort"
+	"sort"
 	"testing"
 )
 
@@ -48,14 +48,14 @@ func TestSelect(t *testing.T) {
 		m[v] = struct{}{}
 	}
 	for k, _ := range m {
-		for i:=0; i<len(s); i++ {
-			e := len(s)
+		for i:=1; i<=len(s); i++ {
+			e := 0
 			c := 0
 			for j:=0; j<len(s); j++ {
 				if s[j] == k {
 					c++
-					if i == c - 1 {
-						e = j
+					if i == c {
+						e = j + 1
 					}
 				}
 			}
@@ -66,7 +66,6 @@ func TestSelect(t *testing.T) {
 		}
 	}
 }
-/*
 
 func TestQuantile(t *testing.T) {
 	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
@@ -86,6 +85,7 @@ func TestQuantile(t *testing.T) {
 	}
 }
 
+/*
 // TestTopkOrder checks whether Topk return array is sort by frequency in descending order or not.
 // The original order is not stable.
 func TestTopkOrder(t *testing.T) {

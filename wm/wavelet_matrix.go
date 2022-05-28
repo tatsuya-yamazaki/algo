@@ -11,7 +11,7 @@ import (
 // WaveletMatrix is the struct of the Wavelet matrix.
 // bitVectors is bits of the original slice.
 // zeroNums is the number of zero of the bitsVector.
-// firstIndexes is the first index of values in the final slice that is generated from bitVectors.
+// firstIndexes is the first index of values in the final slice that is generated from bitVectors. 0-indexed.
 type WaveletMatrix struct {
 	bitVectors []*sds.SuccinctDictionary
 	zeroNums []int
@@ -118,40 +118,34 @@ func (w WaveletMatrix) Rank(value, index int) int {
 	}
 }
 
-// Select returns index of value appeared specified times from original slice index 0.
-// rank is the ascending rank of the values in the array. 0-indexed
+// Select returns index of value appeared specified times from original slice. 1-indexed.
+// rank is the ascending rank of the value in the array. 1-indexed.
 func (w WaveletMatrix) Select(value, rank int) int {
-	//////// remove fmt /////
-	fmt.Println(rank)
-	//////// remove fmt /////
-	out := w.bitVectors[0].Size() //out of range
+	last := w.bitVectors[0].Size() //out of range
 	fi, ok := w.firstIndexes[value]
 	index := fi + rank
-	if !ok || rank < 0 || out <= index {
-		return out
+	if !ok || rank < 1 || last < index || w.Rank(value, last) < rank {
+		return 0
 	}
 
 	for i:=0; i<len(w.bitVectors); i++ {
 		b := w.bitVectors[i]
 		if value & (1<<i) > 0 {
-			index = b.Select(index + 1 - w.zeroNums[i])
+			index = b.Select(index - w.zeroNums[i])
 		} else {
-			index = b.Select0(index + 1)
-		}
-		if out <= index {
-			return out
+			index = b.Select0(index)
 		}
 	}
-	if value == w.Access(index) {
-		return index
-	}
-	return out
+	return index
 }
 
 // Quantile returns nth smallest value in specified interval of the original array.
 // l, r are half-open interval. ex) [0, 1)
 // rank is the rank of values in the array in ascending order. 0-indexed
 func (w WaveletMatrix) Quantile(l, r, rank int) int {
+	//////// remove fmt /////
+	fmt.Println(rank)
+	//////// remove fmt /////
 	value := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
 		b := w.bitVectors[i]

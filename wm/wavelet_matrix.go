@@ -121,7 +121,7 @@ func (w WaveletMatrix) Rank(value, index int) int {
 // Select returns index of value appeared specified times from original slice. 1-indexed.
 // rank is the ascending rank of the value in the array. 1-indexed.
 func (w WaveletMatrix) Select(value, rank int) int {
-	last := w.bitVectors[0].Size() //out of range
+	last := w.bitVectors[0].Size()
 	fi, ok := w.firstIndexes[value]
 	index := fi + rank
 	if !ok || rank < 1 || last < index || w.Rank(value, last) < rank {
@@ -141,27 +141,16 @@ func (w WaveletMatrix) Select(value, rank int) int {
 
 // Quantile returns nth smallest value in specified interval of the original array.
 // l, r are half-open interval. ex) [0, 1)
-// rank is the rank of values in the array in ascending order. 0-indexed
+// rank is the rank of values in the array in ascending order. 1-indexed
 func (w WaveletMatrix) Quantile(l, r, rank int) int {
-	//////// remove fmt /////
-	fmt.Println(rank)
-	//////// remove fmt /////
 	value := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
 		b := w.bitVectors[i]
-		one := 0 // number of 1 in [l, r) of s
-		rightOne := 0 // mumber of 1 in r) of s
-		if r > 0 {
-			rightOne = b.Rank(r - 1)
-			one += rightOne
-		}
-		leftOne := 0 // mumber of 1 in l) of s
-		if l > 0 {
-			leftOne = b.Rank(l - 1)
-			one -= leftOne
-		}
+		rightOne := b.Rank(r) // number of 1 in r) of s
+		leftOne := b.Rank(l) // number of 1 in l) of s
+		one := rightOne - leftOne // number of 1 in [l, r) of s
 		zero := r - l - one // number of 0 in [l, r) of s
-		if rank + 1 > zero {
+		if rank > zero {
 			value += 1<<i
 			z := w.zeroNums[i]
 			l = z + leftOne
@@ -202,6 +191,9 @@ func (n topkNode) Greater(a *heap.HeapNode) bool {
 // l, r are half-open interval. ex) [0, 1).
 // k is the number of items you want to be return. 1-indexed.
 func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
+	//////// remove fmt /////
+	fmt.Println(k)
+	//////// remove fmt /////
 	h := heap.NewHeap(heap.DESCENDING)
 	bits := len(w.bitVectors)
 	h.Add(topkNode{l, r, bits-1, 0})

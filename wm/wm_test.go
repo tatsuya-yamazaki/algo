@@ -76,8 +76,9 @@ func TestQuantile(t *testing.T) {
 			copy(e, s[l:r])
 			sort.Ints(e)
 			for k:=0; k<r-l; k++ {
-				if a := w.Quantile(l,r,k); e[k] != a {
-					t.Errorf("l == %v, r == %v, k == %v", l, r, k)
+				rank := k + 1
+				if a := w.Quantile(l,r,rank); e[k] != a {
+					t.Errorf("l == %v, r == %v, rank == %v", l, r, rank)
 					t.Errorf("%v != %v", e[k], a)
 				}
 			}

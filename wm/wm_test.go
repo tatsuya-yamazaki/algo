@@ -231,7 +231,6 @@ func TestSum(t *testing.T) {
 	}
 }
 
-/*
 // TestIntersect checks whether Intersect returns common values and its frequency in [l1, r1) and [l2, r2) or not.
 func TestIntersect(t *testing.T) {
 	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
@@ -280,4 +279,3 @@ func TestIntersect(t *testing.T) {
 		}
 	}
 }
-*/

@@ -1,7 +1,6 @@
 package wm
 
 import (
-	"fmt"
 	"sort"
 	"algo/heap"
 	"algo/sds"
@@ -225,9 +224,6 @@ func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 // Topk returns sum of value in [l, r).
 // l, r are half-open interval. ex) [0, 1).
 func (w WaveletMatrix) Sum(l, r int) (ret int) {
-	//////// remove fmt /////
-	fmt.Println(r)
-	//////// remove fmt /////
 	k := r - l
 	for _, v := range w.Topk(l, r, k) {
 		ret += v[0] * v[1]
@@ -265,25 +261,17 @@ func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
 		}
 
 		b := w.bitVectors[v.i]
-		// n1 are not 0, so v.r1 are not 0.
-		one1 := b.Rank(v.r1 - 1) // number of one in v.r1)
-		leftOne1 := 0 // number of one in v.l1)
-		if v.l1 > 0 {
-			leftOne1 += b.Rank(v.l1 - 1)
-		}
+		one1 := b.Rank(v.r1) // number of one in v.r1)
+		leftOne1 := b.Rank(v.l1) // number of one in v.l1)
 		leftZero1 := v.l1 - leftOne1 // number of zero in v.l1)
 		zero1 := v.r1 - one1 // number of zero in v.r1)
 
-		// n2 are not 0, so v.r2 are not 0.
-		one2 := b.Rank(v.r2 - 1) // number of one in v.r2)
-		leftOne2 := 0 // number of one in v.l2)
-		if v.l2 > 0 {
-			leftOne2 += b.Rank(v.l2 - 1)
-		}
+		one2 := b.Rank(v.r2) // number of one in v.r2)
+		leftOne2 := b.Rank(v.l2) // number of one in v.l2)
 		leftZero2 := v.l2 - leftOne2 // number of zero in v.l2)
 		zero2 := v.r2 - one2 // number of zero in v.r2)
 
-		zero := b.Rank0(b.Size()-1) // number of zero in b
+		zero := w.zeroNums[v.i] // number of zero in b
 		bit := 1 << v.i
 		v.i-- // next index of bitVectors
 

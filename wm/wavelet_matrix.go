@@ -50,7 +50,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		b := sds.NewSuccinctDictionary(len(sis))
 		for j, v := range sis {
 			if v.v & (1<<i) > 0 {
-				b.Set(j + 1, true)
+				b.Set(j, true)
 				sis[j].b = 1
 			} else {
 				sis[j].b = 0
@@ -71,19 +71,20 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 }
 
 // Access returns original slice item value.
-// index is 1-indexed.
+// index is 0-indexed.
 func (w WaveletMatrix) Access(index int) int {
-	r := 0
+	index++ // fix to 1-indexed
+	value := 0
 	for i:=len(w.bitVectors)-1; i>=0; i-- {
 		b := w.bitVectors[i]
-		if b.Access(index) {
-			r += 1<<i
+		if b.Access(index - 1) {
+			value += 1<<i
 			index = w.zeroNums[i] + b.Rank(index)
 		} else {
 			index = b.Rank0(index)
 		}
 	}
-	return r
+	return value
 }
 
 // Rank returns number of value appeared the interval [0, index) in original slice.

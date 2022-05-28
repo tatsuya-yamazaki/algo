@@ -11,7 +11,7 @@ func TestAccess(t *testing.T) {
 	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)
 	for i:=0; i<len(s); i++ {
-		if a := w.Access(i + 1); s[i] != a {
+		if a := w.Access(i); s[i] != a {
 			t.Errorf("%v != %v", s[i], a)
 		}
 	}

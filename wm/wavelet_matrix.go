@@ -1,3 +1,4 @@
+// TODO modify bit shift operator to pre-calculateted array for performance
 package wm
 
 import (

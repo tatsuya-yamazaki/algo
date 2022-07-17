@@ -279,3 +279,32 @@ func TestIntersect(t *testing.T) {
 		}
 	}
 }
+
+// TestRangefreq checks whether Rangefreq returns number of values x <= v < y in [l, r) or not.
+func TestRangefreq(t *testing.T) {
+	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
+	w := NewWaveletMatrix(s)
+	for l:=0; l<len(s); l++ {
+		for r:=l; r<len(s); r++ {
+			for x:=0; x<10; x++ {
+				for y:=x; y<10; y++ {
+					e := 0
+					for i:=l; i<r; i++ {
+						if x <= s[i] && s[i] < y {
+							e++
+						}
+					}
+					a := w.Rangefreq(l, r, x, y)
+					if e != a {
+						t.Errorf("s == %v", s)
+						t.Errorf("l == %v", l)
+						t.Errorf("r == %v", r)
+						t.Errorf("x == %v", x)
+						t.Errorf("y == %v", y)
+						t.Errorf("%v != %v", e, a)
+					}
+				}
+			}
+		}
+	}
+}

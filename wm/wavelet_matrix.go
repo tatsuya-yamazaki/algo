@@ -281,3 +281,73 @@ func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
 	}
 	return
 }
+
+// rangefreqNode is used by Rangefreq slice.
+// l, r are half-open interval. ex) [0, 1).
+// v is accumulated value of bits.
+type rangefreqNode struct {
+	l, r, v int
+}
+
+// Rangefreq returns the number of value between x and y - 1 in the interval [l, r) of the original array.
+// l, r are half-open interval. ex) [0, 1).
+// The values is greater than and equal x.
+// The values is less than y.
+func (w WaveletMatrix) Rangefreq(l, r, x, y int) (ret int) {
+	if l >= r || x >= y {
+		return 0
+	}
+	y--
+	var s []rangefreqNode
+	s = append(s, rangefreqNode{l, r, 0})
+	var xv, yv int
+	for i:=0; i<63; i++ {
+		if i < len(w.bitVectors) {
+			continue
+		}
+		bit := 1<<i
+		xv += x & bit
+		yv += y & bit
+	}
+	for i:=len(w.bitVectors)-1; i>=0; i-- {
+		bit := 1<<i
+		xv += x & bit
+		yv += y & bit
+		bv := w.bitVectors[i]
+		z := w.zeroNums[i]
+		isRange := func(v int) bool {
+			if v < xv || v > yv {
+				return false
+			}
+			return true
+		}
+		var s2 []rangefreqNode
+		add := func(s []rangefreqNode, l, r, v int) []rangefreqNode {
+			n := r - l
+			if n > 0 {
+				if i == 0 {
+					ret += n
+				} else {
+					s = append(s, rangefreqNode{l, r, v})
+				}
+			}
+			return s
+		}
+		for _, v := range s {
+			zv := v.v
+			ov := v.v + bit
+			rol := bv.Rank(v.l) // number of 1 in v.l)
+			rzl := v.l - rol // number of 0 in v.l)
+			ror := bv.Rank(v.r) // number of 1 in v.r)
+			rzr := v.r - ror // number of 0 in v.r)
+			if isRange(zv) {
+				s2 = add(s2, rzl, rzr, zv)
+			}
+			if isRange(ov) {
+				s2 = add(s2, z + rol, z + ror, ov)
+			}
+		}
+		s = s2
+	}
+	return ret
+}

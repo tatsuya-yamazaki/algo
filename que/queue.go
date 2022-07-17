@@ -17,7 +17,7 @@ func (q *Queue) Next() bool {
 }
 
 func (q *Queue) Add(value QueueValue) {
-	ll := &queueLinkedList{q.end, nil, value}
+	ll := &queueLinkedList{nil, value}
 	if q.end == nil {
 		q.begin = ll
 	} else {
@@ -32,7 +32,6 @@ func (q *Queue) Pop() QueueValue {
 		q.begin = nil
 		q.end = nil
 	} else {
-		q.begin.next.prev = nil
 		q.begin = q.begin.next
 	}
 	return value
@@ -42,6 +41,6 @@ type QueueValue interface {
 }
 
 type queueLinkedList struct {
-        prev, next *queueLinkedList
+        next *queueLinkedList
 	value QueueValue
 }

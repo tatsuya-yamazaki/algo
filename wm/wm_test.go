@@ -8,6 +8,17 @@ import (
 	"testing"
 )
 
+func TestBits(t *testing.T) {
+	for i:=0; i<63; i++ {
+		e := 1<<i
+		a := bits[i]
+		if e != a {
+			t.Errorf("i == %v", i)
+			t.Errorf("%v != %v", e, a)
+		}
+	}
+}
+
 func TestAccess(t *testing.T) {
 	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)

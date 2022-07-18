@@ -2,6 +2,7 @@
 package wm
 
 import (
+	"math/rand"
 	"reflect"
 	"sort"
 	"testing"
@@ -308,3 +309,15 @@ func TestRangefreq(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkNewWaveletMatrix(b *testing.B) {
+	var s []int
+	for i:=0; i<200000; i++ {
+		s = append(s, rand.Int())
+	}
+	b.ResetTimer()
+	for i:=0; i<b.N; i++ {
+		_ = NewWaveletMatrix(s)
+	}
+}
+

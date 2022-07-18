@@ -2,7 +2,6 @@
 package wm
 
 import (
-	"sort"
 	"algo/heap"
 	"algo/sds"
 	"algo/que"
@@ -39,33 +38,44 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	length := topBit + 1
 	w := &WaveletMatrix{make([]*sds.SuccinctDictionary, length), make([]int, length), make(map[int]int)}
 
-	type sortInt struct {
-		v, b int // v is value, b is bit
-	}
-	sis := make([]sortInt, len(t))
-	for i:=0; i<len(t); i++ {
-		sis[i].v = t[i]
+	s0 := make([]int, len(t)) // numbers of previous bit 0
+	s1 := make([]int, 0) // numbers of previous bit 1
+	copy(s0, t)
+
+	setNext := func(n0, n1, s []int, bit, start int, sd *sds.SuccinctDictionary) ([]int, []int) {
+		for i, v := range s {
+			if v & (1<<bit) > 0 {
+				n1 = append(n1, v)
+				sd.Set(start + i, true)
+			} else {
+				n0 = append(n0, v)
+			}
+		}
+		return n0, n1
 	}
 
 	for i:=topBit; i>=0; i-- {
-		b := sds.NewSuccinctDictionary(len(sis))
-		for j, v := range sis {
-			if v.v & (1<<i) > 0 {
-				b.Set(j, true)
-				sis[j].b = 1
-			} else {
-				sis[j].b = 0
-			}
-		}
-		b.Build()
-		w.bitVectors[i] = b
-		w.zeroNums[i] = b.Rank0(b.Size())
-		sort.SliceStable(sis, func(k, l int) bool {return sis[k].b < sis[l].b})
+		var n0, n1 []int // next numbers of previous bit 0 and 1
+		sd := sds.NewSuccinctDictionary(len(t))
+		n0, n1 = setNext(n0, n1, s0, i, 0, sd)
+		n0, n1 = setNext(n0, n1, s1, i, len(s0), sd)
+		s0 = n0
+		s1 = n1
+		sd.Build()
+		w.bitVectors[i] = sd
+		w.zeroNums[i] = sd.Rank0(sd.Size())
 	}
-	for i:=0; i<len(sis); i++ {
-		_, ok := w.firstIndexes[sis[i].v]
+
+	s := s0
+	start := 0
+	for i:=0; i<len(t); i++ {
+		if i == len(s0) {
+			s = s1
+			start -= len(s0)
+		}
+		_, ok := w.firstIndexes[s[start + i]]
 		if !ok {
-			w.firstIndexes[sis[i].v] = i
+			w.firstIndexes[s[start + i]] = i
 		}
 	}
 	return w

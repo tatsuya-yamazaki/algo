@@ -401,6 +401,9 @@ func BenchmarkRangefreq(b *testing.B) {
 	b.ResetTimer()
 	for i:=0; i<b.N; i++ {
 		r := rand.Intn(len(s))
+		if r == 0 {
+			r++
+		}
 		l := rand.Intn(r)
 		y := rand.Int()
 		x := rand.Intn(y)

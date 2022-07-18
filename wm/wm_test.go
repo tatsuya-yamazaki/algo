@@ -19,6 +19,24 @@ func TestBits(t *testing.T) {
 	}
 }
 
+func TestTop(t *testing.T) {
+	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
+	e := -1
+	for _, v := range s {
+		for i:=0; i<63; i++ {
+			if v & (1<<i) > 0 {
+				if i > e {
+					e = i
+				}
+			}
+		}
+	}
+	w := NewWaveletMatrix(s)
+	if a := w.top(); e != a {
+		t.Errorf("%v != %v", e, a)
+	}
+}
+
 func TestAccess(t *testing.T) {
 	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)

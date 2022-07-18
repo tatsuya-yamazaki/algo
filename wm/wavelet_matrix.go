@@ -83,6 +83,11 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	return w
 }
 
+// top returns top bit index in original slice values.
+func (w WaveletMatrix) top() int {
+	return len(w.bitVectors)-1
+}
+
 // Access returns original slice item value.
 // index is 0-indexed.
 func (w WaveletMatrix) Access(index int) int {

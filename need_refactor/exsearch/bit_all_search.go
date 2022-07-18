@@ -1,4 +1,5 @@
 package main
+
 import (
 	"fmt"
 )
@@ -9,10 +10,10 @@ func main() {
 
 func BitAll(n int) [][]int {
 	ret := make([][]int, 1<<n)
-	for i:=0; i<(1<<n); i++ {
+	for i := 0; i < (1 << n); i++ {
 		var r []int
-		for j:=0; j<n; j++ {
-			if i & (1<<j) > 0 {
+		for j := 0; j < n; j++ {
+			if i&(1<<j) > 0 {
 				r = append(r, j)
 			}
 		}

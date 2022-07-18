@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	s := []int{1,2,2,3,3,3,4,4,4,4,5,5,5,5,5}
+	s := []int{1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5}
 	fmt.Println(UpperBound(s, 0))
 	fmt.Println(UpperBound(s, 1))
 	fmt.Println(UpperBound(s, 2))
@@ -18,14 +18,14 @@ func main() {
 }
 
 func UpperBound(s []int, value int) int {
-        l, r := 0, len(s)
-        for l != r {
-                m := (l + r) / 2
-                if value < s[m] {
+	l, r := 0, len(s)
+	for l != r {
+		m := (l + r) / 2
+		if value < s[m] {
 			r = m
-                } else {
+		} else {
 			l = m + 1
-                }
-        }
-        return l
+		}
+	}
+	return l
 }

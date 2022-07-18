@@ -1,8 +1,8 @@
 package prime
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestPrimeFactorize(t *testing.T) {

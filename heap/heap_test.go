@@ -1,6 +1,6 @@
 package heap
 
-import(
+import (
 	"math/rand"
 	"sort"
 	"testing"
@@ -25,7 +25,7 @@ func TestAcsending(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	var te []int
 	ha := NewHeap(ASCENDING)
-	for i:=0; i<100; i++ {
+	for i := 0; i < 100; i++ {
 		v := rand.Intn(100)
 		te = append(te, v)
 		ha.Add(node{v})
@@ -48,7 +48,7 @@ func TestDescsending(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	var te []int
 	hd := NewHeap(DESCENDING)
-	for i:=0; i<100; i++ {
+	for i := 0; i < 100; i++ {
 		v := rand.Intn(100)
 		te = append(te, v)
 		hd.Add(node{v})

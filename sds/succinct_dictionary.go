@@ -1,7 +1,7 @@
 package sds
 
 type SuccinctDictionary struct {
-	size int
+	size   int
 	chunks []int // max bits size N is 2**31 - 1 (max int32)
 	blocks []uint16
 	bits   []uint8
@@ -129,13 +129,13 @@ func (s SuccinctDictionary) Rank(r int) (ret int) {
 	}
 
 	blockIndex := getBlockIndex(index)
-	if blockIndex > 0 && (BLOCK_SIZE * blockIndex % CHUNK_SIZE != 0) {
+	if blockIndex > 0 && (BLOCK_SIZE*blockIndex%CHUNK_SIZE != 0) {
 		ret += int(s.blocks[blockIndex-1])
 	}
 
 	bitsIndex := getBitsIndex(index)
 	bits := uint8(s.bits[bitsIndex])
-	for i := uint8(1); (i <= getBit(index) && i > 0); i <<= 1 {
+	for i := uint8(1); i <= getBit(index) && i > 0; i <<= 1 {
 		if i&bits > 0 {
 			ret++
 		}

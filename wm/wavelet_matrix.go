@@ -2,19 +2,19 @@ package wm
 
 import (
 	"algo/heap"
-	"algo/sds"
 	"algo/que"
+	"algo/sds"
 )
 
-var bits = [63]int{1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608,16777216,33554432,67108864,134217728,268435456,536870912,1073741824,2147483648,4294967296,8589934592,17179869184,34359738368,68719476736,137438953472,274877906944,549755813888,1099511627776,2199023255552,4398046511104,8796093022208,17592186044416,35184372088832,70368744177664,140737488355328,281474976710656,562949953421312,1125899906842624,2251799813685248,4503599627370496,9007199254740992,18014398509481984,36028797018963968,72057594037927936,144115188075855872,288230376151711744,576460752303423488,1152921504606846976,2305843009213693952,4611686018427387904}
+var bits = [63]int{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648, 4294967296, 8589934592, 17179869184, 34359738368, 68719476736, 137438953472, 274877906944, 549755813888, 1099511627776, 2199023255552, 4398046511104, 8796093022208, 17592186044416, 35184372088832, 70368744177664, 140737488355328, 281474976710656, 562949953421312, 1125899906842624, 2251799813685248, 4503599627370496, 9007199254740992, 18014398509481984, 36028797018963968, 72057594037927936, 144115188075855872, 288230376151711744, 576460752303423488, 1152921504606846976, 2305843009213693952, 4611686018427387904}
 
 // WaveletMatrix is the struct of the Wavelet matrix.
 // bitVectors is bits of the original slice.
 // zeroNums is the number of zero of the bitsVector.
 // firstIndexes is the first index of values in the final slice that is generated from bitVectors. 0-indexed.
 type WaveletMatrix struct {
-	bitVectors []*sds.SuccinctDictionary
-	zeroNums []int
+	bitVectors   []*sds.SuccinctDictionary
+	zeroNums     []int
 	firstIndexes map[int]int
 }
 
@@ -30,8 +30,8 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		}
 	}
 	topBit := 0
-	for i:=0; i<63; i++ {
-		if t[max] & (bits[i]) > 0 {
+	for i := 0; i < 63; i++ {
+		if t[max]&(bits[i]) > 0 {
 			topBit = i
 		}
 	}
@@ -40,14 +40,14 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	w := &WaveletMatrix{make([]*sds.SuccinctDictionary, length), make([]int, length), make(map[int]int)}
 
 	s0 := make([]int, len(t)) // numbers of previous bit 0
-	s1 := make([]int, 0) // numbers of previous bit 1
+	s1 := make([]int, 0)      // numbers of previous bit 1
 	copy(s0, t)
 
 	setNext := func(n0, n1, s []int, bit, start int, sd *sds.SuccinctDictionary) ([]int, []int) {
 		for i, v := range s {
-			if v & bits[bit] > 0 {
+			if v&bits[bit] > 0 {
 				n1 = append(n1, v)
-				sd.Set(start + i, true)
+				sd.Set(start+i, true)
 			} else {
 				n0 = append(n0, v)
 			}
@@ -55,7 +55,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		return n0, n1
 	}
 
-	for i:=topBit; i>=0; i-- {
+	for i := topBit; i >= 0; i-- {
 		var n0, n1 []int // next numbers of previous bit 0 and 1
 		sd := sds.NewSuccinctDictionary(len(t))
 		n0, n1 = setNext(n0, n1, s0, i, 0, sd)
@@ -69,14 +69,14 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 
 	s := s0
 	start := 0
-	for i:=0; i<len(t); i++ {
+	for i := 0; i < len(t); i++ {
 		if i == len(s0) {
 			s = s1
 			start -= len(s0)
 		}
-		_, ok := w.firstIndexes[s[start + i]]
+		_, ok := w.firstIndexes[s[start+i]]
 		if !ok {
-			w.firstIndexes[s[start + i]] = i
+			w.firstIndexes[s[start+i]] = i
 		}
 	}
 	return w
@@ -85,7 +85,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 // Top returns top bit index in original slice values.
 // The return value is 0-origin.
 func (w WaveletMatrix) Top() int {
-	return len(w.bitVectors)-1
+	return len(w.bitVectors) - 1
 }
 
 // Access returns original slice item value.
@@ -93,7 +93,7 @@ func (w WaveletMatrix) Top() int {
 func (w WaveletMatrix) Access(index int) int {
 	index++ // fix to 1-indexed
 	value := 0
-	for i:=w.Top(); i>=0; i-- {
+	for i := w.Top(); i >= 0; i-- {
 		b := w.bitVectors[i]
 		if b.Access(index - 1) {
 			value += bits[i]
@@ -111,9 +111,9 @@ func (w WaveletMatrix) Rank(value, index int) int {
 	if !ok {
 		return 0
 	}
-	for i:=w.Top(); i>=0; i-- {
+	for i := w.Top(); i >= 0; i-- {
 		b := w.bitVectors[i]
-		if value & (bits[i]) > 0 {
+		if value&(bits[i]) > 0 {
 			rank := b.Rank(index)
 			// No applicable data
 			if rank == 0 {
@@ -138,12 +138,12 @@ func (w WaveletMatrix) Rank(value, index int) int {
 
 // RankLess returns number of values are less than value in the interval [l, r) of the original slice.
 func (w WaveletMatrix) RankLess(l, r, value int) (ret int) {
-	if top := w.Top(); top < 62 && value >= bits[top] * 2 {
+	if top := w.Top(); top < 62 && value >= bits[top]*2 {
 		return r - l
 	}
-	for i:=w.Top(); i>=0; i-- {
+	for i := w.Top(); i >= 0; i-- {
 		b := w.bitVectors[i]
-		if value & (bits[i]) > 0 {
+		if value&(bits[i]) > 0 {
 			rankLeft := b.Rank(l)
 			one := b.Rank(r) - rankLeft
 			ret += r - l - one
@@ -167,9 +167,9 @@ func (w WaveletMatrix) Select(value, rank int) int {
 		return 0
 	}
 
-	for i:=0; i<=w.Top(); i++ {
+	for i := 0; i <= w.Top(); i++ {
 		b := w.bitVectors[i]
-		if value & (bits[i]) > 0 {
+		if value&(bits[i]) > 0 {
 			index = b.Select(index - w.zeroNums[i])
 		} else {
 			index = b.Select0(index)
@@ -183,12 +183,12 @@ func (w WaveletMatrix) Select(value, rank int) int {
 // rank is the rank of values in the array in ascending order. 1-indexed
 func (w WaveletMatrix) Quantile(l, r, rank int) int {
 	value := 0
-	for i:=w.Top(); i>=0; i-- {
+	for i := w.Top(); i >= 0; i-- {
 		b := w.bitVectors[i]
-		rightOne := b.Rank(r) // number of 1 in r) of s
-		leftOne := b.Rank(l) // number of 1 in l) of s
+		rightOne := b.Rank(r)     // number of 1 in r) of s
+		leftOne := b.Rank(l)      // number of 1 in l) of s
 		one := rightOne - leftOne // number of 1 in [l, r) of s
-		zero := r - l - one // number of 0 in [l, r) of s
+		zero := r - l - one       // number of 0 in [l, r) of s
 		if rank > zero {
 			value += bits[i]
 			z := w.zeroNums[i]
@@ -240,17 +240,17 @@ func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 			continue
 		}
 		b := w.bitVectors[n.i]
-		leftOne := b.Rank(n.l) // num of 1 bit l)
-		leftZero := n.l - leftOne // num of 0 bit l)
+		leftOne := b.Rank(n.l)       // num of 1 bit l)
+		leftZero := n.l - leftOne    // num of 0 bit l)
 		one := b.Rank(n.r) - leftOne // num of 1 bit [l, r)
-		zero := n.r - n.l - one // num of 0 bit [l, r)
-		ni := n.i - 1 // new index of bitVector
+		zero := n.r - n.l - one      // num of 0 bit [l, r)
+		ni := n.i - 1                // new index of bitVector
 		if zero > 0 {
 			h.Add(topkNode{leftZero, leftZero + zero, ni, n.v})
 		}
 		if one > 0 {
 			ol := w.zeroNums[n.i] + leftOne // new l of first 1 bit
-			h.Add(topkNode{ol, ol+one, ni, n.v + bits[n.i]})
+			h.Add(topkNode{ol, ol + one, ni, n.v + bits[n.i]})
 		}
 	}
 	return
@@ -296,22 +296,22 @@ func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
 		}
 
 		b := w.bitVectors[v.i]
-		one1 := b.Rank(v.r1) // number of one in v.r1)
-		leftOne1 := b.Rank(v.l1) // number of one in v.l1)
+		one1 := b.Rank(v.r1)         // number of one in v.r1)
+		leftOne1 := b.Rank(v.l1)     // number of one in v.l1)
 		leftZero1 := v.l1 - leftOne1 // number of zero in v.l1)
-		zero1 := v.r1 - one1 // number of zero in v.r1)
+		zero1 := v.r1 - one1         // number of zero in v.r1)
 
-		one2 := b.Rank(v.r2) // number of one in v.r2)
-		leftOne2 := b.Rank(v.l2) // number of one in v.l2)
+		one2 := b.Rank(v.r2)         // number of one in v.r2)
+		leftOne2 := b.Rank(v.l2)     // number of one in v.l2)
 		leftZero2 := v.l2 - leftOne2 // number of zero in v.l2)
-		zero2 := v.r2 - one2 // number of zero in v.r2)
+		zero2 := v.r2 - one2         // number of zero in v.r2)
 
 		zero := w.zeroNums[v.i] // number of zero in b
 		bit := bits[v.i]
 		v.i-- // next index of bitVectors
 
 		q.Add(intersectValue{leftZero1, zero1, leftZero2, zero2, v.i, v.v})
-		q.Add(intersectValue{zero+leftOne1, zero+one1, zero+leftOne2, zero+one2, v.i, v.v+bit})
+		q.Add(intersectValue{zero + leftOne1, zero + one1, zero + leftOne2, zero + one2, v.i, v.v + bit})
 	}
 	return
 }

@@ -1,5 +1,6 @@
 package main
-import(
+
+import (
 	"fmt"
 )
 
@@ -7,14 +8,14 @@ type BinarySearchTree struct {
 	root *Node
 }
 
-func NewBinarySearchTree () *BinarySearchTree {
+func NewBinarySearchTree() *BinarySearchTree {
 	return &BinarySearchTree{}
 }
 
 type Node struct {
 	value int
 	right *Node
-	left *Node
+	left  *Node
 }
 
 func NewNode(value int) *Node {

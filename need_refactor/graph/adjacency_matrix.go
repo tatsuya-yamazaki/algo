@@ -1,6 +1,6 @@
 package main
 
-import(
+import (
 	"fmt"
 )
 
@@ -10,9 +10,9 @@ func main() {
 }
 
 func NewAdjacencyMatrix(n int) [][]bool {
-        m := make([][]bool, n)
-        for i:=0; i<n; i++ {
-                m[i] = make([]bool, n)
-        }
-        return m
+	m := make([][]bool, n)
+	for i := 0; i < n; i++ {
+		m[i] = make([]bool, n)
+	}
+	return m
 }

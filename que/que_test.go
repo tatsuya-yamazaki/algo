@@ -1,6 +1,6 @@
 package que
 
-import(
+import (
 	"reflect"
 	"testing"
 )
@@ -14,7 +14,7 @@ type dequeValue struct {
 }
 
 func TestQueue(t *testing.T) {
-	e := []queueValue{{1},{2},{3},{4},{5},{6},{7},{8}}
+	e := []queueValue{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}}
 	q := NewQueue()
 	for _, v := range e {
 		q.Add(v)
@@ -31,7 +31,7 @@ func TestQueue(t *testing.T) {
 }
 
 func TestDequeAddLeftPopRight(t *testing.T) {
-	e := []dequeValue{{1},{2},{3},{4},{5},{6},{7},{8}}
+	e := []dequeValue{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}}
 	d := NewDeque()
 	for _, v := range e {
 		d.AddLeft(v)
@@ -48,7 +48,7 @@ func TestDequeAddLeftPopRight(t *testing.T) {
 }
 
 func TestDequeAddLeftPopLeft(t *testing.T) {
-	e := []dequeValue{{1},{2},{3},{4},{5},{6},{7},{8}}
+	e := []dequeValue{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}}
 	d := NewDeque()
 	for _, v := range e {
 		d.AddLeft(v)
@@ -67,7 +67,7 @@ func TestDequeAddLeftPopLeft(t *testing.T) {
 }
 
 func TestDequeAddRightPopLeft(t *testing.T) {
-	e := []dequeValue{{1},{2},{3},{4},{5},{6},{7},{8}}
+	e := []dequeValue{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}}
 	d := NewDeque()
 	for _, v := range e {
 		d.AddRight(v)
@@ -84,7 +84,7 @@ func TestDequeAddRightPopLeft(t *testing.T) {
 }
 
 func TestDequeAddRightPopRight(t *testing.T) {
-	e := []dequeValue{{1},{2},{3},{4},{5},{6},{7},{8}}
+	e := []dequeValue{{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}}
 	d := NewDeque()
 	for _, v := range e {
 		d.AddRight(v)

@@ -35,11 +35,11 @@ func TestSetAccess(t *testing.T) {
 
 func TestRank(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
-	for i:=0; i<1038; i++ {
+	for i := 0; i < 1038; i++ {
 		s.Set(i, true)
 	}
 	s.Build()
-	for i:=0; i<=1038; i++ {
+	for i := 0; i <= 1038; i++ {
 		if a := s.Rank(i); i != a {
 			t.Errorf("%v != %v", i, a)
 		}
@@ -49,7 +49,7 @@ func TestRank(t *testing.T) {
 func TestRank0(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
 	s.Build()
-	for i:=0; i<=1038; i++ {
+	for i := 0; i <= 1038; i++ {
 		if a := s.Rank0(i); i != a {
 			t.Errorf("%v != %v", i, a)
 		}
@@ -58,11 +58,11 @@ func TestRank0(t *testing.T) {
 
 func TestSelect(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
-	for i:=0; i<1038; i++ {
+	for i := 0; i < 1038; i++ {
 		s.Set(i, true)
 	}
 	s.Build()
-	for i:=0; i<=1038; i++ {
+	for i := 0; i <= 1038; i++ {
 		if a := s.Select(i); i != a {
 			t.Errorf("%v != %v", i, a)
 		}
@@ -72,7 +72,7 @@ func TestSelect(t *testing.T) {
 func TestSelect0(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
 	s.Build()
-	for i:=0; i<=1038; i++ {
+	for i := 0; i <= 1038; i++ {
 		if a := s.Select0(i); i != a {
 			t.Errorf("%v != %v", i, a)
 		}

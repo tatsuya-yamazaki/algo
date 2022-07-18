@@ -9,7 +9,7 @@ func Eratosthenes(max int) (p []int) {
 	isNotPrime[0] = true
 	isNotPrime[1] = true
 
-	for i:=2; i<=max; i++ {
+	for i := 2; i <= max; i++ {
 		if isNotPrime[i] {
 			continue
 		}

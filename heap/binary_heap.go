@@ -17,12 +17,12 @@ type HeapNode interface {
 // TODO It may need to be refactored, expecially Pop().
 // TODO It may need to be devided into min heap and max heap. Then remove isChild, use Less or Greater
 type Heap struct {
-	n []*HeapNode
+	n       []*HeapNode
 	isChild func(parent, child int) bool
 }
 
-const(
-	ASCENDING = true
+const (
+	ASCENDING  = true
 	DESCENDING = false
 )
 
@@ -41,7 +41,7 @@ func parent(i int) int {
 }
 
 func left(i int) int {
-	return i * 2 + 1
+	return i*2 + 1
 }
 
 func right(i int) int {
@@ -57,7 +57,7 @@ func (h *Heap) Add(value HeapNode) {
 			break
 		}
 		h.n[p], h.n[i] = h.n[i], h.n[p]
-		i =p
+		i = p
 	}
 }
 
@@ -67,7 +67,7 @@ func (h *Heap) Top() *HeapNode {
 
 func (h *Heap) Pop() HeapNode {
 	ret := h.n[0]
-	last := len(h.n)-1
+	last := len(h.n) - 1
 	h.n[0] = h.n[last]
 	h.n = h.n[:last]
 	i := 0

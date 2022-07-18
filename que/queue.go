@@ -2,7 +2,7 @@ package que
 
 type Queue struct {
 	begin *queueLinkedList
-	end *queueLinkedList
+	end   *queueLinkedList
 }
 
 func NewQueue() *Queue {
@@ -41,6 +41,6 @@ type QueueValue interface {
 }
 
 type queueLinkedList struct {
-        next *queueLinkedList
+	next  *queueLinkedList
 	value QueueValue
 }

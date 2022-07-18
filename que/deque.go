@@ -2,7 +2,7 @@ package que
 
 type Deque struct {
 	begin *dequeLinkedList
-	end *dequeLinkedList
+	end   *dequeLinkedList
 }
 
 func NewDeque() *Deque {
@@ -64,6 +64,6 @@ type DequeValue interface {
 }
 
 type dequeLinkedList struct {
-        prev, next *dequeLinkedList
-	value DequeValue
+	prev, next *dequeLinkedList
+	value      DequeValue
 }

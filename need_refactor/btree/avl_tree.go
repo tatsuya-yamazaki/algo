@@ -1,5 +1,6 @@
 package main
-import(
+
+import (
 	"fmt"
 )
 
@@ -7,20 +8,20 @@ type Avl struct {
 	root *Node
 }
 
-func NewAvl () *Avl {
+func NewAvl() *Avl {
 	return &Avl{}
 }
 
 type Node struct {
-	value int
+	value  int
 	height int
-	right *Node
-	left *Node
+	right  *Node
+	left   *Node
 }
 
 func NewNode(value int) *Node {
 	return &Node{
-		value: value,
+		value:  value,
 		height: 1,
 	}
 }
@@ -106,7 +107,7 @@ func (t *Avl) Remove(value int) bool {
 		route = route[:len(route)-1]
 	} else {
 		additionalRoute := t.removeNodeHasChildren(n)
-		for i:=0; i<len(additionalRoute)-1; i++ {
+		for i := 0; i < len(additionalRoute)-1; i++ {
 			route = append(route, additionalRoute[i])
 		}
 	}
@@ -208,7 +209,7 @@ func (t *Avl) echo(n *Node, space string) {
 }
 
 func (t *Avl) balance(route []*Node, isAdd bool) {
-	for i:=len(route)-1; i>=0; i-- {
+	for i := len(route) - 1; i >= 0; i-- {
 		n := route[i]
 		var parent *Node
 		if i != 0 {
@@ -217,25 +218,35 @@ func (t *Avl) balance(route []*Node, isAdd bool) {
 		n.updateHeight()
 		switch n.getBalance() {
 		case -1:
-			if !isAdd { return }
+			if !isAdd {
+				return
+			}
 		case -2:
 			if n.left.getBalance() > 0 {
 				t.rotateLR(n, parent, n.left)
 			} else {
 				t.rotateR(n, parent, n.left)
 			}
-			if isAdd { return }
+			if isAdd {
+				return
+			}
 		case 0:
-			if isAdd { return }
+			if isAdd {
+				return
+			}
 		case 1:
-			if !isAdd { return }
+			if !isAdd {
+				return
+			}
 		case 2:
 			if n.right.getBalance() < 0 {
 				t.rotateRL(n, parent, n.right)
 			} else {
 				t.rotateL(n, parent, n.right)
 			}
-			if isAdd { return }
+			if isAdd {
+				return
+			}
 		}
 	}
 }

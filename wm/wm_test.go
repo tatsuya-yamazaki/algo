@@ -321,3 +321,19 @@ func BenchmarkNewWaveletMatrix(b *testing.B) {
 	}
 }
 
+func BenchmarkRangefreq(b *testing.B) {
+	var s []int
+	for i:=0; i<200000; i++ {
+		s = append(s, rand.Int())
+	}
+	w := NewWaveletMatrix(s)
+	b.ResetTimer()
+	for i:=0; i<b.N; i++ {
+		r := rand.Intn(len(s))
+		l := rand.Intn(r)
+		y := rand.Int()
+		x := rand.Intn(y)
+		w.Rangefreq(l, r, x, y)
+	}
+}
+

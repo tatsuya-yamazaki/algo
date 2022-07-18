@@ -31,8 +31,8 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		}
 	}
 	topBit := 0
-	for i:=0; i<64; i++ {
-		if t[max] & (1<<i) > 0 {
+	for i:=0; i<63; i++ {
+		if t[max] & (bits[i]) > 0 {
 			topBit = i
 		}
 	}
@@ -94,10 +94,10 @@ func (w WaveletMatrix) Top() int {
 func (w WaveletMatrix) Access(index int) int {
 	index++ // fix to 1-indexed
 	value := 0
-	for i:=len(w.bitVectors)-1; i>=0; i-- {
+	for i:=w.Top(); i>=0; i-- {
 		b := w.bitVectors[i]
 		if b.Access(index - 1) {
-			value += 1<<i
+			value += bits[i]
 			index = w.zeroNums[i] + b.Rank(index)
 		} else {
 			index = b.Rank0(index)
@@ -112,9 +112,9 @@ func (w WaveletMatrix) Rank(value, index int) int {
 	if !ok {
 		return 0
 	}
-	for i:=len(w.bitVectors)-1; i>=0; i-- {
+	for i:=w.Top(); i>=0; i-- {
 		b := w.bitVectors[i]
-		if value & (1<<i) > 0 {
+		if value & (bits[i]) > 0 {
 			rank := b.Rank(index)
 			// No applicable data
 			if rank == 0 {
@@ -149,7 +149,7 @@ func (w WaveletMatrix) Select(value, rank int) int {
 
 	for i:=0; i<len(w.bitVectors); i++ {
 		b := w.bitVectors[i]
-		if value & (1<<i) > 0 {
+		if value & (bits[i]) > 0 {
 			index = b.Select(index - w.zeroNums[i])
 		} else {
 			index = b.Select0(index)
@@ -163,14 +163,14 @@ func (w WaveletMatrix) Select(value, rank int) int {
 // rank is the rank of values in the array in ascending order. 1-indexed
 func (w WaveletMatrix) Quantile(l, r, rank int) int {
 	value := 0
-	for i:=len(w.bitVectors)-1; i>=0; i-- {
+	for i:=w.Top(); i>=0; i-- {
 		b := w.bitVectors[i]
 		rightOne := b.Rank(r) // number of 1 in r) of s
 		leftOne := b.Rank(l) // number of 1 in l) of s
 		one := rightOne - leftOne // number of 1 in [l, r) of s
 		zero := r - l - one // number of 0 in [l, r) of s
 		if rank > zero {
-			value += 1<<i
+			value += bits[i]
 			z := w.zeroNums[i]
 			l = z + leftOne
 			r = z + rightOne
@@ -211,12 +211,7 @@ func (n topkNode) Greater(a *heap.HeapNode) bool {
 // k is the number of items you want to be return. 1-indexed.
 func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 	h := heap.NewHeap(heap.DESCENDING)
-	bits := len(w.bitVectors)
-	h.Add(topkNode{l, r, bits-1, 0})
-	bv := make([]int, bits)
-	for i:=0; i<bits; i++ {
-		bv[i] = 1<<i
-	}
+	h.Add(topkNode{l, r, w.Top(), 0})
 	for h.Next() && k > 0 {
 		n := h.Pop().(topkNode)
 		if n.i == -1 {
@@ -235,7 +230,7 @@ func (w WaveletMatrix) Topk(l, r, k int) (ret [][2]int) {
 		}
 		if one > 0 {
 			ol := w.zeroNums[n.i] + leftOne // new l of first 1 bit
-			h.Add(topkNode{ol, ol+one, ni, n.v + bv[n.i]})
+			h.Add(topkNode{ol, ol+one, ni, n.v + bits[n.i]})
 		}
 	}
 	return
@@ -266,7 +261,7 @@ type intersectValue struct {
 // l2, r2 are half-open interval. ex) [0, 1). 0-indexed
 func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
 	q := que.NewQueue()
-	q.Add(intersectValue{l1, r1, l2, r2, len(w.bitVectors)-1, 0})
+	q.Add(intersectValue{l1, r1, l2, r2, w.Top(), 0})
 	for q.Next() {
 		v := q.Pop().(intersectValue)
 		n1 := v.r1 - v.l1 // length of [l1, r1)
@@ -317,12 +312,12 @@ func (w WaveletMatrix) Rangefreq(l, r, x, y int) (ret int) {
 		if i < len(w.bitVectors) {
 			continue
 		}
-		bit := 1<<i
+		bit := bits[i]
 		xv += x & bit
 		yv += y & bit
 	}
-	for i:=len(w.bitVectors)-1; i>=0; i-- {
-		bit := 1<<i
+	for i:=w.Top(); i>=0; i-- {
+		bit := bits[i]
 		xv += x & bit
 		yv += y & bit
 		bv := w.bitVectors[i]

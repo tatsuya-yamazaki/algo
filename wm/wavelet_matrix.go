@@ -137,6 +137,27 @@ func (w WaveletMatrix) Rank(value, index int) int {
 	}
 }
 
+// RankLess returns number of values are less than value in the interval [l, r) of the original slice.
+func (w WaveletMatrix) RankLess(l, r, value int) (ret int) {
+	if top := w.Top(); top < 62 && value >= bits[top] * 2 {
+		return r - l
+	}
+	for i:=w.Top(); i>=0; i-- {
+		b := w.bitVectors[i]
+		if value & (bits[i]) > 0 {
+			rankLeft := b.Rank(l)
+			one := b.Rank(r) - rankLeft
+			ret += r - l - one
+			l = w.zeroNums[i] + rankLeft
+			r = l + one
+		} else {
+			l = b.Rank0(l)
+			r = b.Rank0(r)
+		}
+	}
+	return ret
+}
+
 // Select returns index of value appeared specified times from original slice. 1-indexed.
 // rank is the ascending rank of the value in the array. 1-indexed.
 func (w WaveletMatrix) Select(value, rank int) int {

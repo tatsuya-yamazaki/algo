@@ -90,6 +90,28 @@ func TestRank(t *testing.T) {
 	}
 }
 
+func TestRankLess(t *testing.T) {
+	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
+	w := NewWaveletMatrix(s)
+	v := 6
+	for l:=0; l<len(s); l++ {
+		for r:=l; r<=len(s); r++ {
+			e := 0
+			for i:=l; i<r; i++ {
+				if s[i] < v {
+					e++
+				}
+			}
+			if a := w.RankLess(l,r,v); e != a {
+				t.Errorf("s == %v", s)
+				t.Errorf("l == %v, r == %v, v == %v", l, r, v)
+				t.Errorf("%v != %v", e, a)
+				return
+			}
+		}
+	}
+}
+
 func TestSelect(t *testing.T) {
 	s := []int{5,4,5,5,2,1,5,6,1,3,5,0}
 	w := NewWaveletMatrix(s)

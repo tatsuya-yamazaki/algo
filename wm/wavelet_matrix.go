@@ -84,6 +84,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 }
 
 // Top returns top bit index in original slice values.
+// The return value is 0-origin.
 func (w WaveletMatrix) Top() int {
 	return len(w.bitVectors)-1
 }

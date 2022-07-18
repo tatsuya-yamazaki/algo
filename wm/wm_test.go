@@ -31,6 +31,10 @@ func TestTop(t *testing.T) {
 			}
 		}
 	}
+	// If s is all zero, top bit is 1.
+	if e == -1 {
+		e = 0
+	}
 	w := NewWaveletMatrix(s)
 	if a := w.top(); e != a {
 		t.Errorf("%v != %v", e, a)
@@ -44,6 +48,22 @@ func TestAccess(t *testing.T) {
 		if a := w.Access(i); s[i] != a {
 			t.Errorf("%v != %v", s[i], a)
 		}
+	}
+}
+
+func TestAllZero(t *testing.T) {
+	s := []int{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+	w := NewWaveletMatrix(s)
+	for i:=0; i<len(s); i++ {
+		if a := w.Access(i); s[i] != a {
+			t.Errorf("%v != %v", s[i], a)
+		}
+	}
+	if e, a := 1, len(w.bitVectors); e != a {
+		t.Errorf("bitVector number %v != %v", e, a)
+	}
+	if e, a := 0, w.top(); e != a {
+		t.Errorf("top bit %v != %v", e, a)
 	}
 }
 

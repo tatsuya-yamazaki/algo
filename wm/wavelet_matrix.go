@@ -46,7 +46,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 
 	setNext := func(n0, n1, s []int, bit, start int, sd *sds.SuccinctDictionary) ([]int, []int) {
 		for i, v := range s {
-			if v & (1<<bit) > 0 {
+			if v & bits[bit] > 0 {
 				n1 = append(n1, v)
 				sd.Set(start + i, true)
 			} else {
@@ -147,7 +147,7 @@ func (w WaveletMatrix) Select(value, rank int) int {
 		return 0
 	}
 
-	for i:=0; i<len(w.bitVectors); i++ {
+	for i:=0; i<=w.Top(); i++ {
 		b := w.bitVectors[i]
 		if value & (bits[i]) > 0 {
 			index = b.Select(index - w.zeroNums[i])
@@ -287,7 +287,7 @@ func (w WaveletMatrix) Intersect(l1, r1, l2, r2 int) (ret [][3]int) {
 		zero2 := v.r2 - one2 // number of zero in v.r2)
 
 		zero := w.zeroNums[v.i] // number of zero in b
-		bit := 1 << v.i
+		bit := bits[v.i]
 		v.i-- // next index of bitVectors
 
 		q.Add(intersectValue{leftZero1, zero1, leftZero2, zero2, v.i, v.v})
@@ -309,7 +309,7 @@ func (w WaveletMatrix) Rangefreq(l, r, x, y int) (ret int) {
 	s = append(s, [3]int{l, r, 0})
 	var xv, yv int
 	for i:=0; i<63; i++ {
-		if i < len(w.bitVectors) {
+		if i <= w.Top() {
 			continue
 		}
 		bit := bits[i]

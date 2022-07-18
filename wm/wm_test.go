@@ -36,7 +36,7 @@ func TestTop(t *testing.T) {
 		e = 0
 	}
 	w := NewWaveletMatrix(s)
-	if a := w.top(); e != a {
+	if a := w.Top(); e != a {
 		t.Errorf("%v != %v", e, a)
 	}
 }
@@ -62,7 +62,7 @@ func TestAllZero(t *testing.T) {
 	if e, a := 1, len(w.bitVectors); e != a {
 		t.Errorf("bitVector number %v != %v", e, a)
 	}
-	if e, a := 0, w.top(); e != a {
+	if e, a := 0, w.Top(); e != a {
 		t.Errorf("top bit %v != %v", e, a)
 	}
 }

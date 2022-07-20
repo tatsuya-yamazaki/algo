@@ -42,8 +42,8 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	s := make([]int, len(t)) // previous numbers
 	copy(s, t)
 	ns := make([]int, len(t)) // next numbers
-	p0, p1 := len(t), 0       // previous length of 0, 1
-	n0, n1 := len(t), 0       // next length of 0, 1
+	p0, p1 := len(t), 0       // previous length of 0, 1 bit numbers
+	n0, n1 := 0, 0            // next length of 0, 1 bit numbers
 
 	setNext := func(i, j, start int, sd *sds.SuccinctDictionary) {
 		if s[j]&bits[i] > 0 {
@@ -62,6 +62,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		for j := 0; j < p0; j++ {
 			setNext(i, j, 0, sd)
 		}
+		// 1 bit number is reverse order
 		for j := len(t) - 1; j >= len(t)-p1; j-- {
 			setNext(i, j, p0, sd)
 		}

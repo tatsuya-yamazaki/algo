@@ -84,13 +84,13 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	}
 
 	if p0 > 0 {
-		prev = s[0] + 1 // set a value different from the first term
+		prev = s[0] - 1 // set a value different from the first term
 		for i := 0; i < p0; i++ {
 			setFirstIndex(i, 0, i)
 		}
 	}
 	if p1 > 0 {
-		prev = s[len(t)-1] + 1 // set a value different from the first term
+		prev = s[len(t)-1] - 1 // set a value different from the first term
 		// 1 bit number is reverse order
 		for i, j := len(t)-1, 0; i >= len(t)-p1; i, j = i-1, j+1 {
 			setFirstIndex(i, p0, j)

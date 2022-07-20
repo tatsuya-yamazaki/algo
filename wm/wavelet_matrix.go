@@ -39,44 +39,59 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	length := topBit + 1
 	w := &WaveletMatrix{make([]*sds.SuccinctDictionary, length), make([]int, length), make(map[int]int)}
 
-	s0 := make([]int, len(t)) // numbers of previous bit 0
-	s1 := make([]int, 0)      // numbers of previous bit 1
-	copy(s0, t)
+	s := make([]int, len(t)) // previous numbers
+	copy(s, t)
+	ns := make([]int, len(t)) // next numbers
+	p0, p1 := len(t), 0 // previous length of 0, 1
+	n0, n1 := len(t), 0 // next length of 0, 1
 
-	setNext := func(n0, n1, s []int, bit, start int, sd *sds.SuccinctDictionary) ([]int, []int) {
-		for i, v := range s {
-			if v&bits[bit] > 0 {
-				n1 = append(n1, v)
-				sd.Set(start+i, true)
-			} else {
-				n0 = append(n0, v)
-			}
+	setNext := func(i, j, start int, sd *sds.SuccinctDictionary) {
+		if s[j]&bits[i] > 0 {
+			ns[len(t)-1-n1] = s[j] // set 1 bit number in reverse
+			sd.Set(n0+n1, true)
+			n1++
+		} else {
+			ns[n0] = s[j]
+			n0++
 		}
-		return n0, n1
 	}
 
 	for i := topBit; i >= 0; i-- {
-		var n0, n1 []int // next numbers of previous bit 0 and 1
+		n0, n1 = 0, 0
 		sd := sds.NewSuccinctDictionary(len(t))
-		n0, n1 = setNext(n0, n1, s0, i, 0, sd)
-		n0, n1 = setNext(n0, n1, s1, i, len(s0), sd)
-		s0 = n0
-		s1 = n1
+		for j:=0; j<p0; j++ {
+			setNext(i, j, 0, sd)
+		}
+		for j:=len(t)-1; j>=len(t)-p1; j-- {
+			setNext(i, j, p0, sd)
+		}
 		sd.Build()
 		w.bitVectors[i] = sd
 		w.zeroNums[i] = sd.Rank0(sd.Size())
+		s, ns = ns, s
+		p0, p1 = n0, n1
 	}
 
-	s := s0
-	start := 0
-	for i := 0; i < len(t); i++ {
-		if i == len(s0) {
-			s = s1
-			start -= len(s0)
+	var prev int // previous value
+	setFirstIndex := func(i, start, j int) {
+		v := s[i]
+		if prev == v {
+			return
 		}
-		_, ok := w.firstIndexes[s[start+i]]
-		if !ok {
-			w.firstIndexes[s[start+i]] = i
+		prev = v
+		w.firstIndexes[v] = start + j
+	}
+
+	if p0 > 0 {
+		prev = s[0] + 1 // set a value different from the first term
+		for i:=0; i<p0; i++ {
+			setFirstIndex(i, 0, i)
+		}
+	}
+	if p1 > 0 {
+		prev = s[len(t)-1] + 1	// set a value different from the first term
+		for i, j:=len(t)-1, 0; i>=len(t)-p1; i, j = i-1, j+1 {
+			setFirstIndex(i, p0, j)
 		}
 	}
 	return w

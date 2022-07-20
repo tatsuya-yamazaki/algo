@@ -235,7 +235,7 @@ func (n topkNode) Less(a *heap.HeapNode) bool {
 	return (n.r - n.l) < (v.r - v.l)
 }
 
-// Less returns whether n is greater than a or not.
+// Greater returns whether n is greater than a or not.
 func (n topkNode) Greater(a *heap.HeapNode) bool {
 	v := (*a).(topkNode)
 	return (n.r - n.l) > (v.r - v.l)

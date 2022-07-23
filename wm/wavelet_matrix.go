@@ -177,12 +177,11 @@ func (w WaveletMatrix) RankLess(l, r, value int) (ret int) {
 // Select returns index of value appeared specified times from original slice. 1-indexed.
 // rank is the ascending rank of the value in the array. 1-indexed.
 func (w WaveletMatrix) Select(value, rank int) int {
-	last := w.bitVectors[0].Size()
 	fi, ok := w.firstIndexes[value]
-	index := fi + rank
-	if !ok || rank < 1 || last < index || w.Rank(value, last) < rank {
+	if !ok {
 		return 0
 	}
+	index := fi + rank
 
 	for i := 0; i <= w.Top(); i++ {
 		b := w.bitVectors[i]

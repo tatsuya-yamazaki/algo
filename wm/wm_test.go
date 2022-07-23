@@ -115,12 +115,12 @@ func TestRankLess(t *testing.T) {
 func TestSelect(t *testing.T) {
 	s := []int{5, 4, 5, 5, 2, 1, 5, 6, 1, 3, 5, 0}
 	w := NewWaveletMatrix(s)
-	m := make(map[int]struct{})
+	m := make(map[int]int)
 	for _, v := range s {
-		m[v] = struct{}{}
+		m[v]++
 	}
 	for k, _ := range m {
-		for i := 1; i <= len(s); i++ {
+		for i := 1; i <= m[k]; i++ {
 			e := 0
 			c := 0
 			for j := 0; j < len(s); j++ {
@@ -389,6 +389,23 @@ func BenchmarkNewWaveletMatrix(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = NewWaveletMatrix(s)
+	}
+}
+
+func BenchmarkSelect(b *testing.B) {
+	var s []int
+	m := make(map[int]int)
+	for i := 0; i < 200000; i++ {
+		v := rand.Int()
+		m[v]++
+		s = append(s, v)
+	}
+	w := NewWaveletMatrix(s)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		value := s[rand.Intn(len(s))]
+		rank := rand.Intn(m[value]) + 1
+		w.Select(value, rank)
 	}
 }
 

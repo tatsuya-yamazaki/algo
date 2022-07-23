@@ -80,11 +80,91 @@ func TestSelect0(t *testing.T) {
 	}
 }
 
+func BenchmarkNewSuccinctDictionary(b *testing.B) {
+	for i:=0; i<b.N; i++ {
+		_ = NewSuccinctDictionary(200000)
+	}
+}
+
+func BenchmarkBuild(b *testing.B) {
+	s := NewSuccinctDictionary(200000)
+	for i:=0; i<200000; i++ {
+		if rand.Intn(2) > 0 {
+			s.Set(i, true)
+		}
+	}
+	b.ResetTimer()
+	for i:=0; i<b.N; i++ {
+		s.Build()
+	}
+}
+
+func BenchmarkSet(b *testing.B) {
+	s := NewSuccinctDictionary(200000)
+	for i:=0; i<200000; i++ {
+		if rand.Intn(2) > 0 {
+			s.Set(i, true)
+		}
+	}
+	s.Build()
+	b.ResetTimer()
+	for i:=0; i<b.N; i++ {
+		j := rand.Intn(200000)
+		b := false
+		if rand.Intn(2) > 0 {
+			b = true
+		}
+		s.Set(j, b)
+	}
+}
+
+func BenchmarkAccess(b *testing.B) {
+	s := NewSuccinctDictionary(200000)
+	for i:=0; i<200000; i++ {
+		if rand.Intn(2) > 0 {
+			s.Set(i, true)
+		}
+	}
+	s.Build()
+	b.ResetTimer()
+	for i:=0; i<b.N; i++ {
+		s.Access(rand.Intn(200000))
+	}
+}
+
+func BenchmarkRank(b *testing.B) {
+	s := NewSuccinctDictionary(200000)
+	for i:=0; i<200000; i++ {
+		if rand.Intn(2) > 0 {
+			s.Set(i, true)
+		}
+	}
+	s.Build()
+	b.ResetTimer()
+	for i:=0; i<b.N; i++ {
+		s.Rank(rand.Intn(200000))
+	}
+}
+
+func BenchmarkRank0(b *testing.B) {
+	s := NewSuccinctDictionary(200000)
+	for i:=0; i<200000; i++ {
+		if rand.Intn(2) > 0 {
+			s.Set(i, true)
+		}
+	}
+	s.Build()
+	b.ResetTimer()
+	for i:=0; i<b.N; i++ {
+		s.Rank0(rand.Intn(200000))
+	}
+}
+
 func BenchmarkSelect(b *testing.B) {
 	s := NewSuccinctDictionary(200000)
 	c := 0
 	for i:=0; i<200000; i++ {
-		if rand.Intn(1) > 0 {
+		if rand.Intn(2) > 0 {
 			c++
 			s.Set(i, true)
 		}
@@ -100,7 +180,7 @@ func BenchmarkSelect0(b *testing.B) {
 	s := NewSuccinctDictionary(200000)
 	c := 200000
 	for i:=0; i<200000; i++ {
-		if rand.Intn(1) > 0 {
+		if rand.Intn(2) > 0 {
 			c--
 			s.Set(i, true)
 		}

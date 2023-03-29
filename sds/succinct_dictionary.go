@@ -1,17 +1,17 @@
 package sds
 
 type SuccinctDictionary struct {
-	size   int
-	chunks []int // max bits size N is 2**31 - 1 (max int32)
-	blocks []uint16
-	bits   []uint8
+	size  int
+	large []int // max bits size N is 2**31 - 1 (max int32)
+	small []uint16
+	bits  []uint8
 }
 
-// BLOCK_SIZE * m = CHUNK_SIZE (m >= 2)
-// BITS_SIZE * l = BLOCK_SIZE (l >= 2)
+// SMALL_SIZE * m = LARGE_SIZE (m >= 2)
+// BITS_SIZE * l = SMALL_SIZE (l >= 2)
 const (
-	CHUNK_SIZE = 1024 // (log2(N+1))**2
-	BLOCK_SIZE = 16   // log2(N+1) / 2
+	LARGE_SIZE = 1024 // (log2(N+1))**2
+	SMALL_SIZE = 16   // log2(N+1) / 2
 	BITS_SIZE  = 8    // uint8 size
 )
 
@@ -28,8 +28,8 @@ func NewSuccinctDictionary(size int) *SuccinctDictionary {
 		}
 		return ret
 	}
-	s.chunks = make([]int, getSuitableLength(CHUNK_SIZE))
-	s.blocks = make([]uint16, getSuitableLength(BLOCK_SIZE))
+	s.large = make([]int, getSuitableLength(LARGE_SIZE))
+	s.small = make([]uint16, getSuitableLength(SMALL_SIZE))
 	s.bits = make([]uint8, getSuitableLength(BITS_SIZE))
 	return s
 }
@@ -57,12 +57,12 @@ func getBit(n int) uint8 {
 	return 1 << (n % BITS_SIZE)
 }
 
-func getChunkIndex(index int) int {
-	return index / CHUNK_SIZE
+func getLargeIndex(index int) int {
+	return index / LARGE_SIZE
 }
 
-func getBlockIndex(index int) int {
-	return index / BLOCK_SIZE
+func getSmallIndex(index int) int {
+	return index / SMALL_SIZE
 }
 
 func getBitsIndex(index int) int {
@@ -94,26 +94,26 @@ func (s *SuccinctDictionary) Set(index int, b bool) {
 }
 
 func (s *SuccinctDictionary) Build() {
-	s.chunks[0] = 0
-	s.blocks[0] = 0
+	s.large[0] = 0
+	s.small[0] = 0
 	ci, bi := 0, 0
 	for i, v := range s.bits {
 		index := i * BITS_SIZE
-		cin := getChunkIndex(index)
-		bin := getBlockIndex(index)
+		cin := getLargeIndex(index)
+		bin := getSmallIndex(index)
 		if ci < cin {
-			s.chunks[cin] = s.chunks[ci]
+			s.large[cin] = s.large[ci]
 			ci = cin
-			s.blocks[bin] = 0
+			s.small[bin] = 0
 			bi = bin
 		}
 		if bi < bin {
-			s.blocks[bin] = s.blocks[bi]
+			s.small[bin] = s.small[bi]
 			bi = bin
 		}
 		c := bitNums[v]
-		s.chunks[ci] += int(c)
-		s.blocks[bi] += uint16(c)
+		s.large[ci] += int(c)
+		s.small[bi] += uint16(c)
 	}
 }
 
@@ -123,14 +123,14 @@ func (s SuccinctDictionary) Rank(r int) (ret int) {
 		return 0
 	}
 	index := r - 1
-	chunkIndex := getChunkIndex(index)
-	if chunkIndex > 0 {
-		ret += int(s.chunks[chunkIndex-1])
+	largeIndex := getLargeIndex(index)
+	if largeIndex > 0 {
+		ret += int(s.large[largeIndex-1])
 	}
 
-	blockIndex := getBlockIndex(index)
-	if blockIndex > 0 && (BLOCK_SIZE*blockIndex%CHUNK_SIZE != 0) {
-		ret += int(s.blocks[blockIndex-1])
+	smallIndex := getSmallIndex(index)
+	if smallIndex > 0 && (SMALL_SIZE*smallIndex%LARGE_SIZE != 0) {
+		ret += int(s.small[smallIndex-1])
 	}
 
 	bitsIndex := getBitsIndex(index)
@@ -141,7 +141,7 @@ func (s SuccinctDictionary) Rank(r int) (ret int) {
 		}
 	}
 
-	for i := bitsIndex - 1; i >= 0 && blockIndex == getBlockIndex(i*BITS_SIZE); i-- {
+	for i := bitsIndex - 1; i >= 0 && smallIndex == getSmallIndex(i*BITS_SIZE); i-- {
 		ret += int(bitNums[s.bits[i]])
 	}
 

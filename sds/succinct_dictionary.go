@@ -28,8 +28,8 @@ func NewSuccinctDictionary(size int) *SuccinctDictionary {
 		}
 		return ret
 	}
-	s.large = make([]int, getSuitableLength(LARGE_SIZE))
-	s.small = make([]uint16, getSuitableLength(SMALL_SIZE))
+	s.large = make([]int, getSuitableLength(LARGE_SIZE)+1)
+	s.small = make([]uint16, getSuitableLength(SMALL_SIZE)+1)
 	s.bits = make([]uint8, getSuitableLength(BITS_SIZE))
 	return s
 }
@@ -94,26 +94,29 @@ func (s *SuccinctDictionary) Set(index int, b bool) {
 }
 
 func (s *SuccinctDictionary) Build() {
-	s.large[0] = 0
 	s.small[0] = 0
-	ci, bi := 0, 0
+	s.large[0] = 0
+	beforeSmallIndex := 0
+	beforeLargeIndex := 0
 	for i, v := range s.bits {
 		index := i * BITS_SIZE
-		cin := getLargeIndex(index)
-		bin := getSmallIndex(index)
-		if ci < cin {
-			s.large[cin] = s.large[ci]
-			ci = cin
-			s.small[bin] = 0
-			bi = bin
+		smallIndex := getSmallIndex(index) + 1
+		largeIndex := getLargeIndex(index) + 1
+
+		if beforeSmallIndex < smallIndex {
+			s.small[smallIndex] = s.small[beforeSmallIndex]
+			beforeSmallIndex = smallIndex
 		}
-		if bi < bin {
-			s.small[bin] = s.small[bi]
-			bi = bin
+
+		if beforeLargeIndex < largeIndex {
+			s.large[largeIndex] = s.large[beforeLargeIndex]
+			s.small[smallIndex-1] = 0
+			beforeLargeIndex = largeIndex
 		}
-		c := bitNums[v]
-		s.large[ci] += int(c)
-		s.small[bi] += uint16(c)
+
+		bitCount := bitNums[v]
+		s.small[smallIndex] += uint16(bitCount)
+		s.large[largeIndex] += int(bitCount)
 	}
 }
 
@@ -124,25 +127,21 @@ func (s SuccinctDictionary) Rank(r int) (ret int) {
 	}
 	index := r - 1
 	largeIndex := getLargeIndex(index)
-	if largeIndex > 0 {
-		ret += int(s.large[largeIndex-1])
-	}
+	ret += int(s.large[largeIndex])
 
 	smallIndex := getSmallIndex(index)
-	if smallIndex > 0 && (SMALL_SIZE*smallIndex%LARGE_SIZE != 0) {
-		ret += int(s.small[smallIndex-1])
-	}
+	ret += int(s.small[smallIndex])
 
 	bitsIndex := getBitsIndex(index)
+	for i := bitsIndex - 1; i >= 0 && smallIndex == getSmallIndex(i*BITS_SIZE); i-- {
+		ret += int(bitNums[s.bits[i]])
+	}
+
 	bits := uint8(s.bits[bitsIndex])
 	for i := uint8(1); i <= getBit(index) && i > 0; i <<= 1 {
 		if i&bits > 0 {
 			ret++
 		}
-	}
-
-	for i := bitsIndex - 1; i >= 0 && smallIndex == getSmallIndex(i*BITS_SIZE); i-- {
-		ret += int(bitNums[s.bits[i]])
 	}
 
 	return ret

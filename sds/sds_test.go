@@ -43,6 +43,9 @@ func TestRank(t *testing.T) {
 	for i := 0; i <= 1038; i++ {
 		if a := s.Rank(i); i != a {
 			t.Errorf("%v != %v", i, a)
+			t.Errorf("%v", s.small)
+			t.Errorf("%v", s.large)
+			return
 		}
 	}
 }
@@ -53,6 +56,7 @@ func TestRank0(t *testing.T) {
 	for i := 0; i <= 1038; i++ {
 		if a := s.Rank0(i); i != a {
 			t.Errorf("%v != %v", i, a)
+			return
 		}
 	}
 }
@@ -66,6 +70,7 @@ func TestSelect(t *testing.T) {
 	for i := 0; i <= 1038; i++ {
 		if a := s.Select(i); i != a {
 			t.Errorf("%v != %v", i, a)
+			return
 		}
 	}
 }
@@ -76,6 +81,7 @@ func TestSelect0(t *testing.T) {
 	for i := 0; i <= 1038; i++ {
 		if a := s.Select0(i); i != a {
 			t.Errorf("%v != %v", i, a)
+			return
 		}
 	}
 }

@@ -4,10 +4,8 @@ package heap
 
 // Node is the interface a node of Heap.
 // Less returns Node is less than a or not.
-// Greater returns Node is greater than a or not.
 type HeapNode interface {
 	Less(a *HeapNode) bool
-	Greater(a *HeapNode) bool
 }
 
 // Heap is the binary heap structure.
@@ -15,7 +13,7 @@ type HeapNode interface {
 // Its indexes are 0-origin.
 // It can use ascending or descending order.
 // TODO It may need to be refactored, expecially Pop().
-// TODO It may need to be devided into min heap and max heap. Then remove isChild, use Less or Greater
+// TODO It may need to be devided into min heap and max heap. Then remove isChild
 type Heap struct {
 	n       []*HeapNode
 	isChild func(parent, child int) bool
@@ -31,7 +29,7 @@ func NewHeap(ascending bool) *Heap {
 	if ascending {
 		h.isChild = func(parent, child int) bool { return (*h.n[parent]).Less(h.n[child]) }
 	} else {
-		h.isChild = func(parent, child int) bool { return (*h.n[parent]).Greater(h.n[child]) }
+		h.isChild = func(parent, child int) bool { return !(*h.n[parent]).Less(h.n[child]) }
 	}
 	return h
 }

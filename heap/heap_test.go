@@ -16,11 +16,6 @@ func (n node) Less(a *HeapNode) bool {
 	return n.a < v.a
 }
 
-func (n node) Greater(a *HeapNode) bool {
-	v := (*a).(node)
-	return n.a > v.a
-}
-
 func TestAcsending(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	var te []int

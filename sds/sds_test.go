@@ -48,6 +48,13 @@ func TestRank(t *testing.T) {
 			return
 		}
 	}
+	// out of range
+	for i := 1039; i <= 1040; i++ {
+		if a := s.Rank(i); 1038 != a {
+			t.Errorf("%v != %v", 1038, a)
+			return
+		}
+	}
 }
 
 func TestRank0(t *testing.T) {
@@ -56,6 +63,13 @@ func TestRank0(t *testing.T) {
 	for i := 0; i <= 1038; i++ {
 		if a := s.Rank0(i); i != a {
 			t.Errorf("%v != %v", i, a)
+			return
+		}
+	}
+	// out of range
+	for i := 1039; i <= 1040; i++ {
+		if a := s.Rank0(i); 1038 != a {
+			t.Errorf("%v != %v", 1038, a)
 			return
 		}
 	}

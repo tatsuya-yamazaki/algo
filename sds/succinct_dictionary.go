@@ -152,6 +152,9 @@ func (s SuccinctDictionary) Rank0(r int) int {
 	if r < 1 {
 		return 0
 	}
+	if r > s.size {
+		return s.size
+	}
 	return r - s.Rank(r)
 }
 

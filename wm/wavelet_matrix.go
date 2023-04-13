@@ -234,12 +234,6 @@ func (n topkNode) Less(a *heap.HeapNode) bool {
 	return (n.r - n.l) < (v.r - v.l)
 }
 
-// Greater returns whether n is greater than a or not.
-func (n topkNode) Greater(a *heap.HeapNode) bool {
-	v := (*a).(topkNode)
-	return (n.r - n.l) > (v.r - v.l)
-}
-
 // Topk returns top k frequent values in [l, r).
 // return array is sort by frequency in descending order,
 // but is not stable original order.

@@ -156,10 +156,10 @@ func (s SuccinctDictionary) Rank0(r int) int {
 }
 
 // Select returns index where 1 bit appears n times.
-// The index is 1-indexed.
-// If the real index is i, it returns i + 1.
+// The index is 0-indexed.
+// If the number of 1 bits is less than n, it returns out of range index.
 func (s SuccinctDictionary) Select(n int) int {
-	l, r := 0, s.size
+	l, r := 1, s.size+1
 	for l < r {
 		m := (l + r) / 2
 		rank := s.Rank(m)
@@ -169,14 +169,14 @@ func (s SuccinctDictionary) Select(n int) int {
 			r = m
 		}
 	}
-	return l
+	return l - 1
 }
 
 // Select returns index where 0 bit appears n times.
-// The index is 1-indexed.
-// If the real index is i, it returns i + 1.
+// The index is 0-indexed.
+// If the number of 0 bits is less than n, it returns out of range index.
 func (s SuccinctDictionary) Select0(n int) int {
-	l, r := 0, s.size
+	l, r := 1, s.size+1
 	for l < r {
 		m := (l + r) / 2
 		rank := s.Rank0(m)
@@ -186,5 +186,5 @@ func (s SuccinctDictionary) Select0(n int) int {
 			r = m
 		}
 	}
-	return l
+	return l - 1
 }

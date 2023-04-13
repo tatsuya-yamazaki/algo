@@ -174,8 +174,9 @@ func (w WaveletMatrix) RankLess(l, r, value int) (ret int) {
 	return ret
 }
 
-// Select returns index of value appeared specified times from original slice. 1-indexed.
+// Select returns index of value appeared specified times from original slice. 0-indexed.
 // rank is the ascending rank of the value in the array. 1-indexed.
+// If the number of values is less than rank, it returns out of range index.
 func (w WaveletMatrix) Select(value, rank int) int {
 	fi, ok := w.firstIndexes[value]
 	if !ok {
@@ -186,12 +187,12 @@ func (w WaveletMatrix) Select(value, rank int) int {
 	for i := 0; i <= w.Top(); i++ {
 		b := w.bitVectors[i]
 		if value&(bits[i]) > 0 {
-			index = b.Select(index - w.zeroNums[i])
+			index = b.Select(index-w.zeroNums[i]) + 1
 		} else {
-			index = b.Select0(index)
+			index = b.Select0(index) + 1
 		}
 	}
-	return index
+	return index - 1
 }
 
 // Quantile returns nth smallest value in specified interval of the original array.

@@ -127,7 +127,7 @@ func TestSelect(t *testing.T) {
 				if s[j] == k {
 					c++
 					if i == c {
-						e = j + 1
+						e = j
 					}
 				}
 			}
@@ -136,6 +136,10 @@ func TestSelect(t *testing.T) {
 				t.Errorf("%v != %v", e, a)
 			}
 		}
+	}
+	// out of range
+	if a := w.Select(1, len(s)+2); len(s) != a {
+		t.Errorf("%v != %v", len(s), a)
 	}
 }
 

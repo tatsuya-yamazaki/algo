@@ -67,9 +67,20 @@ func TestSelect(t *testing.T) {
 		s.Set(i, true)
 	}
 	s.Build()
-	for i := 0; i <= 1038; i++ {
-		if a := s.Select(i); i != a {
-			t.Errorf("%v != %v", i, a)
+	if a := s.Select(0); 0 != a {
+		t.Errorf("%v != %v", 0, a)
+		return
+	}
+	for i := 1; i <= 1038; i++ {
+		if a := s.Select(i); i-1 != a {
+			t.Errorf("%v != %v", i-1, a)
+			return
+		}
+	}
+	// out of range
+	for i := 1039; i <= 1040; i++ {
+		if a := s.Select(i); 1038 != a {
+			t.Errorf("%v != %v", 1038, a)
 			return
 		}
 	}
@@ -78,9 +89,20 @@ func TestSelect(t *testing.T) {
 func TestSelect0(t *testing.T) {
 	s := NewSuccinctDictionary(1038)
 	s.Build()
-	for i := 0; i <= 1038; i++ {
-		if a := s.Select0(i); i != a {
-			t.Errorf("%v != %v", i, a)
+	if a := s.Select0(0); 0 != a {
+		t.Errorf("%v != %v", 0, a)
+		return
+	}
+	for i := 1; i <= 1038; i++ {
+		if a := s.Select0(i); i-1 != a {
+			t.Errorf("%v != %v", i-1, a)
+			return
+		}
+	}
+	// out of range
+	for i := 1039; i <= 1040; i++ {
+		if a := s.Select0(i); 1038 != a {
+			t.Errorf("%v != %v", 1038, a)
 			return
 		}
 	}

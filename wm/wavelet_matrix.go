@@ -16,6 +16,7 @@ type WaveletMatrix struct {
 	bitVectors   []*sds.SuccinctDictionary
 	zeroNums     []int
 	firstIndexes map[int]int
+	size         int
 }
 
 // NewWaveletMatrix returns pointer of WaveletMatrix.
@@ -37,7 +38,7 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 	}
 
 	length := topBit + 1
-	w := &WaveletMatrix{make([]*sds.SuccinctDictionary, length), make([]int, length), make(map[int]int)}
+	w := &WaveletMatrix{make([]*sds.SuccinctDictionary, length), make([]int, length), make(map[int]int), len(t)}
 
 	s := make([]int, len(t)) // previous numbers
 	copy(s, t)
@@ -97,6 +98,11 @@ func NewWaveletMatrix(t []int) *WaveletMatrix {
 		}
 	}
 	return w
+}
+
+// Size returns the size of original slice.
+func (w WaveletMatrix) Size() int {
+	return w.size
 }
 
 // Top returns top bit index in original slice values.

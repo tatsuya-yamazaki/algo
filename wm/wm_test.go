@@ -19,6 +19,14 @@ func TestBits(t *testing.T) {
 	}
 }
 
+func TestSize(t *testing.T) {
+	s := []int{5, 4, 5, 5, 2, 1, 5, 6, 1, 3, 5, 0}
+	w := NewWaveletMatrix(s)
+	if a := w.Size(); len(s) != a {
+		t.Errorf("%v != %v", len(s), a)
+	}
+}
+
 func TestTop(t *testing.T) {
 	s := []int{5, 4, 5, 5, 2, 1, 5, 6, 1, 3, 5, 0}
 	e := -1

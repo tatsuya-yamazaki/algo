@@ -74,7 +74,7 @@ func TestRank(t *testing.T) {
 	for _, v := range s {
 		m[v] = struct{}{}
 	}
-	for k, _ := range m {
+	for k := range m {
 		for i := 1; i <= len(s); i++ {
 			c := 0
 			for j := 0; j < i; j++ {
@@ -119,7 +119,7 @@ func TestSelect(t *testing.T) {
 	for _, v := range s {
 		m[v]++
 	}
-	for k, _ := range m {
+	for k := range m {
 		for i := 1; i <= m[k]; i++ {
 			e := 0
 			c := 0

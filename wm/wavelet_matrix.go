@@ -185,7 +185,7 @@ func (w WaveletMatrix) RankLess(l, r, value int) (ret int) {
 func (w WaveletMatrix) Select(value, rank int) int {
 	fi, ok := w.firstIndexes[value]
 	if !ok {
-		return 0
+		return w.Size()
 	}
 	index := fi + rank
 

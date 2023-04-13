@@ -146,7 +146,11 @@ func TestSelect(t *testing.T) {
 		}
 	}
 	// out of range
-	if a := w.Select(1, len(s)+2); len(s) != a {
+	if a := w.Select(s[0], len(s)+2); len(s) != a {
+		t.Errorf("%v != %v", len(s), a)
+	}
+	// not found
+	if a := w.Select(1234567890, 1); len(s) != a {
 		t.Errorf("%v != %v", len(s), a)
 	}
 }

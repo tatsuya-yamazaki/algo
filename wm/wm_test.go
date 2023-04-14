@@ -12,9 +12,9 @@ func TestBits(t *testing.T) {
 	for i := 0; i < 63; i++ {
 		e := 1 << i
 		a := bits[i]
-		if e != a {
+		if a != e {
 			t.Errorf("i == %v", i)
-			t.Errorf("%v != %v", e, a)
+			t.Errorf("%v != %v", a, e)
 		}
 	}
 }
@@ -22,8 +22,8 @@ func TestBits(t *testing.T) {
 func TestSize(t *testing.T) {
 	s := []int{5, 4, 5, 5, 2, 1, 5, 6, 1, 3, 5, 0}
 	w := NewWaveletMatrix(s)
-	if a := w.Size(); len(s) != a {
-		t.Errorf("%v != %v", len(s), a)
+	if a := w.Size(); a != len(s) {
+		t.Errorf("%v != %v", a, len(s))
 	}
 }
 
@@ -44,8 +44,8 @@ func TestTop(t *testing.T) {
 		e = 0
 	}
 	w := NewWaveletMatrix(s)
-	if a := w.Top(); e != a {
-		t.Errorf("%v != %v", e, a)
+	if a := w.Top(); a != e {
+		t.Errorf("%v != %v", a, e)
 	}
 }
 
@@ -53,8 +53,8 @@ func TestAccess(t *testing.T) {
 	s := []int{5, 4, 5, 5, 2, 1, 5, 6, 1, 3, 5, 0}
 	w := NewWaveletMatrix(s)
 	for i := 0; i < len(s); i++ {
-		if a := w.Access(i); s[i] != a {
-			t.Errorf("%v != %v", s[i], a)
+		if a := w.Access(i); a != s[i] {
+			t.Errorf("%v != %v", a, s[i])
 		}
 	}
 }
@@ -63,15 +63,15 @@ func TestAllZero(t *testing.T) {
 	s := []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	w := NewWaveletMatrix(s)
 	for i := 0; i < len(s); i++ {
-		if a := w.Access(i); s[i] != a {
-			t.Errorf("%v != %v", s[i], a)
+		if a := w.Access(i); a != s[i] {
+			t.Errorf("%v != %v", a, s[i])
 		}
 	}
-	if e, a := 1, len(w.bitVectors); e != a {
-		t.Errorf("bitVector number %v != %v", e, a)
+	if a, e := 1, len(w.bitVectors); a != e {
+		t.Errorf("bitVector number %v != %v", a, e)
 	}
-	if e, a := 0, w.Top(); e != a {
-		t.Errorf("top bit %v != %v", e, a)
+	if a, e := 0, w.Top(); a != e {
+		t.Errorf("top bit %v != %v", a, e)
 	}
 }
 
@@ -90,9 +90,9 @@ func TestRank(t *testing.T) {
 					c++
 				}
 			}
-			if a := w.Rank(k, i); c != a {
+			if a := w.Rank(k, i); a != c {
 				t.Errorf("k == %v, i == %v", k, i)
-				t.Errorf("%v != %v", c, a)
+				t.Errorf("%v != %v", a, c)
 			}
 		}
 	}
@@ -110,10 +110,10 @@ func TestRankLess(t *testing.T) {
 					e++
 				}
 			}
-			if a := w.RankLess(l, r, v); e != a {
+			if a := w.RankLess(l, r, v); a != e {
 				t.Errorf("s == %v", s)
 				t.Errorf("l == %v, r == %v, v == %v", l, r, v)
-				t.Errorf("%v != %v", e, a)
+				t.Errorf("%v != %v", a, e)
 				return
 			}
 		}
@@ -139,19 +139,19 @@ func TestSelect(t *testing.T) {
 					}
 				}
 			}
-			if a := w.Select(k, i); e != a {
+			if a := w.Select(k, i); a != e {
 				t.Errorf("k == %v, i == %v", k, i)
-				t.Errorf("%v != %v", e, a)
+				t.Errorf("%v != %v", a, e)
 			}
 		}
 	}
 	// out of range
-	if a := w.Select(s[0], len(s)+2); len(s) != a {
-		t.Errorf("%v != %v", len(s), a)
+	if a := w.Select(s[0], len(s)+2); a != len(s) {
+		t.Errorf("%v != %v", a, len(s))
 	}
 	// not found
-	if a := w.Select(1234567890, 1); len(s) != a {
-		t.Errorf("%v != %v", len(s), a)
+	if a := w.Select(1234567890, 1); a != len(s) {
+		t.Errorf("%v != %v", a, len(s))
 	}
 }
 
@@ -165,9 +165,9 @@ func TestQuantile(t *testing.T) {
 			sort.Ints(e)
 			for k := 0; k < r-l; k++ {
 				rank := k + 1
-				if a := w.Quantile(l, r, rank); e[k] != a {
+				if a := w.Quantile(l, r, rank); a != e[k] {
 					t.Errorf("l == %v, r == %v, rank == %v", l, r, rank)
-					t.Errorf("%v != %v", e[k], a)
+					t.Errorf("%v != %v", a, e[k])
 				}
 			}
 		}
@@ -240,11 +240,11 @@ func TestTopkWithMaxk(t *testing.T) {
 			for _, v := range a {
 				ma[v[0]] = v[1]
 			}
-			if !reflect.DeepEqual(me, ma) {
+			if !reflect.DeepEqual(ma, me) {
 				t.Errorf("si == %v", si)
 				t.Errorf("l == %v, r == %v, k == %v", l, r, k)
-				t.Errorf("%v != %v", e, a)
-				t.Errorf("%v != %v", me, ma)
+				t.Errorf("%v != %v", a, e)
+				t.Errorf("%v != %v", ma, me)
 			}
 		}
 	}
@@ -288,11 +288,11 @@ func TestTopkWithOverk(t *testing.T) {
 			for _, v := range a {
 				ma[v[0]] = v[1]
 			}
-			if !reflect.DeepEqual(me, ma) {
+			if !reflect.DeepEqual(ma, me) {
 				t.Errorf("si == %v", si)
 				t.Errorf("l == %v, r == %v, k == %v", l, r, k)
-				t.Errorf("%v != %v", e, a)
-				t.Errorf("%v != %v", me, ma)
+				t.Errorf("%v != %v", a, e)
+				t.Errorf("%v != %v", ma, me)
 			}
 		}
 	}
@@ -310,10 +310,10 @@ func TestSum(t *testing.T) {
 			for _, v := range si {
 				e += v
 			}
-			if a := w.Sum(l, r); e != a {
+			if a := w.Sum(l, r); a != e {
 				t.Errorf("si == %v", si)
 				t.Errorf("l == %v, r == %v", l, r)
-				t.Errorf("%v != %v", e, a)
+				t.Errorf("%v != %v", a, e)
 			}
 		}
 	}
@@ -354,13 +354,13 @@ func TestIntersect(t *testing.T) {
 					sort.Slice(e, func(i, j int) bool { return e[i][0] < e[j][0] })
 					sort.Slice(a, func(i, j int) bool { return e[i][0] < e[j][0] })
 
-					if !reflect.DeepEqual(e, a) {
+					if !reflect.DeepEqual(a, e) {
 						t.Errorf("si1 == %v", si1)
 						t.Errorf("si2 == %v", si2)
 						t.Errorf("l1 == %v, r1 == %v, l2 == %v, r2 == %v", l1, r1, l2, r2)
-						t.Errorf("%T != %T", e, a)
-						t.Errorf("%v != %v", e, a)
-						t.Errorf("len %v != %v", len(e), len(a))
+						t.Errorf("%T != %T", a, e)
+						t.Errorf("%v != %v", a, e)
+						t.Errorf("len %v != %v", len(a), len(e))
 					}
 				}
 			}
@@ -383,13 +383,13 @@ func TestRangefreq(t *testing.T) {
 						}
 					}
 					a := w.Rangefreq(l, r, x, y)
-					if e != a {
+					if a != e {
 						t.Errorf("s == %v", s)
 						t.Errorf("l == %v", l)
 						t.Errorf("r == %v", r)
 						t.Errorf("x == %v", x)
 						t.Errorf("y == %v", y)
-						t.Errorf("%v != %v", e, a)
+						t.Errorf("%v != %v", a, e)
 					}
 				}
 			}

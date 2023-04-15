@@ -52,25 +52,6 @@ func NewSuccinctDictionary(size int) *SuccinctDictionary {
 	return s
 }
 
-var bitNums = [256]uint8{
-	0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
-	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-	4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8,
-}
-
 func getBit(n int) uint8 {
 	return 1 << (n % BITS_SIZE)
 }
@@ -132,7 +113,7 @@ func (s *SuccinctDictionary) Build() {
 			beforeLargeIndex = largeIndex
 		}
 
-		bitCount := bitNums[v]
+		bitCount := bitCounts[v][BITS_SIZE-1]
 		s.small[smallIndex] += uint16(bitCount)
 		s.large[largeIndex] += int(bitCount)
 	}
@@ -152,7 +133,7 @@ func (s SuccinctDictionary) Rank(r int) (ret int) {
 
 	bitsIndex := getBitsIndex(index)
 	for i := bitsIndex - 1; i >= 0 && smallIndex == getSmallIndex(i*BITS_SIZE); i-- {
-		ret += int(bitNums[s.bits[i]])
+		ret += int(bitCounts[s.bits[i]][BITS_SIZE-1])
 	}
 
 	ret += bitCounts[s.bits[bitsIndex]][index%BITS_SIZE]

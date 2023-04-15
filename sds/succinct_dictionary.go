@@ -1,5 +1,23 @@
 package sds
 
+// This array contains the sum of 1 bits from the beginning to each digit position in all uint8 values.
+var bitCounts [256][8]int
+
+func init() {
+	// bitCounts initialization
+	for i := 0; i < 256; i++ {
+		var bitCount [8]int
+		c := 0
+		for j := 0; j < 8; j++ {
+			if i&(1<<j) > 0 {
+				c++
+			}
+			bitCount[j] = c
+		}
+		bitCounts[i] = bitCount
+	}
+}
+
 type SuccinctDictionary struct {
 	size  int
 	large []int // max bits size N is 2^31 - 1 (max int32)
@@ -137,12 +155,7 @@ func (s SuccinctDictionary) Rank(r int) (ret int) {
 		ret += int(bitNums[s.bits[i]])
 	}
 
-	bits := uint8(s.bits[bitsIndex])
-	for i := uint8(1); i <= getBit(index) && i > 0; i <<= 1 {
-		if i&bits > 0 {
-			ret++
-		}
-	}
+	ret += bitCounts[s.bits[bitsIndex]][index%BITS_SIZE]
 
 	return ret
 }

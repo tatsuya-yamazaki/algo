@@ -2,7 +2,7 @@ package sds
 
 type SuccinctDictionary struct {
 	size  int
-	large []int // max bits size N is 2**31 - 1 (max int32)
+	large []int // max bits size N is 2^31 - 1 (max int32)
 	small []uint16
 	bits  []uint8
 }
@@ -10,7 +10,7 @@ type SuccinctDictionary struct {
 // SMALL_SIZE * m = LARGE_SIZE (m >= 2)
 // BITS_SIZE * l = SMALL_SIZE (l >= 2)
 const (
-	LARGE_SIZE = 1024 // (log2(N+1))**2
+	LARGE_SIZE = 1024 // (log2(N+1))^2
 	SMALL_SIZE = 16   // log2(N+1) / 2
 	BITS_SIZE  = 8    // uint8 size
 )

@@ -94,7 +94,7 @@ func (s *SuccinctDictionary) Set(index int, b bool) {
 	*bits -= bit
 }
 
-func (s *SuccinctDictionary) Build() {
+func (s *SuccinctDictionary) buildRankIndex() {
 	s.small[0] = 0
 	s.large[0] = 0
 	beforeSmallIndex := 0
@@ -119,6 +119,10 @@ func (s *SuccinctDictionary) Build() {
 		s.small[smallIndex] += uint16(bitCount)
 		s.large[largeIndex] += int(bitCount)
 	}
+}
+
+func (s *SuccinctDictionary) Build() {
+	s.buildRankIndex()
 }
 
 // Rank returns 1 bit num in [0, r)

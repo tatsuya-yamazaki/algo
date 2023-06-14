@@ -28,9 +28,11 @@ type SuccinctDictionary struct {
 // SMALL_SIZE * m = LARGE_SIZE (m >= 2)
 // BITS_SIZE * l = SMALL_SIZE (l >= 2)
 const (
-	LARGE_SIZE = 1024 // (log2(N+1))^2
-	SMALL_SIZE = 16   // log2(N+1) / 2
-	BITS_SIZE  = 8    // uint8 size
+	LARGE_SIZE                  = 1024    // (log2(N+1))^2
+	SMALL_SIZE                  = 16      // log2(N+1) / 2
+	BITS_SIZE                   = 8       // uint8 size
+	SELECT_BLOCK_SIZE           = 1024    // (log2(N+1))^2
+	SELECT_BLOCK_TYPE_THRESHOLD = 1048576 // (log2(N+1))^4
 )
 
 func NewSuccinctDictionary(size int) *SuccinctDictionary {
